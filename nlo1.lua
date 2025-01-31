@@ -212,3 +212,91 @@ w1:Toggle(
         end
     end
 )
+
+local espEnabled2 = false
+
+local function createESP2(object, infoText)
+    local highlight = Instance.new("Highlight")
+    highlight.Parent = object
+    highlight.FillColor = Color3.fromRGB(255, 255, 255) -- 默认白色
+    highlight.FillTransparency = 0.5 -- 设置填充颜色的透明度为 0.5
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- 外线白色
+    highlight.Adornee = object
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Adornee = object
+    billboard.Size = UDim2.new(0, 200, 0, 50)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.Parent = object
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Parent = billboard
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = infoText
+    textLabel.Font = Enum.Font.RobotoMono
+    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- 默认白色
+    textLabel.TextSize = 14
+end
+
+local function searchAndApplyESP()
+    -- 搜索 SmileCoin 并应用 ESP
+    for _, obj in pairs(game.Workspace:GetDescendants()) do
+        if obj.Name == "SmileCoin" then
+            createESP2(obj, "SmileCoin")
+        end
+    end
+
+    -- 搜索 Infector 和其中的 Part 并应用 ESP
+    for _, obj in pairs(game.Workspace:GetDescendants()) do
+        if obj:IsA("Folder") and obj.Name == "Infector" then
+            for _, part in pairs(obj:GetDescendants()) do
+                if part:IsA("Part") then
+                    createESP2(part, string.format("Infector Part: %s", part.Name))
+                end
+            end
+        end
+    end
+end
+
+local function removeESP2(object)
+    for _, v in pairs(object:GetChildren()) do
+        if v:IsA("Highlight") or v:IsA("BillboardGui") then
+            v:Destroy()
+        end
+    end
+end
+
+local function removeAllESP()
+    -- 移除所有 SmileCoin 的 ESP
+    for _, obj in pairs(game.Workspace:GetDescendants()) do
+        if obj.Name == "SmileCoin" then
+            removeESP2(obj)
+        end
+    end
+
+    -- 移除所有 Infector 及其 Part 的 ESP
+    for _, obj in pairs(game.Workspace:GetDescendants()) do
+        if obj:IsA("Folder") and obj.Name == "Infector" then
+            for _, part in pairs(obj:GetDescendants()) do
+                if part:IsA("Part") then
+                    removeESP2(part)
+                end
+            end
+        end
+    end
+end
+
+w1:Toggle(
+    "ESP SmileCoin & Infector",
+    "espItems",
+    false,
+    function(toggled)
+        espEnabled2 = toggled
+        if espEnabled then
+            searchAndApplyESP()
+        else
+            removeAllESP()
+        end
+    end
+)
