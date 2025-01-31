@@ -1,6 +1,6 @@
 local library = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/0x"))()
 
-local w1 = library:Window("Simple Edition V1") -- 更新窗口名称
+local w1 = library:Window("Explorer") -- 更新窗口名称
 
 w1:Slider(
     "WalkSpeed",
@@ -137,6 +137,81 @@ w1:Toggle(
                     wait(0.1)
                 end
             end)
+        end
+    end
+)
+local w2 = library:Window("Visuals")
+
+local espEnabled = false
+
+local function createESP(player)
+    local highlight = Instance.new("Highlight")
+    highlight.Parent = player.Character
+    highlight.FillColor = player.Team and player.TeamColor.Color or Color3.fromRGB(255, 255, 255) 
+    highlight.FillTransparency = 0.5 
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 255) 
+    highlight.Adornee = player.Character
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Adornee = player.Character
+    billboard.Size = UDim2.new(0, 200, 0, 50)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.Parent = player.Character
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Parent = billboard
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = string.format("Name: %s\nDistance: %d\nTeam: %s\nHealth: %d", player.Name, (player.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude, player.Team and player.Team.Name or "None", player.Character.Humanoid.Health)
+    textLabel.Font = Enum.Font.RobotoMono
+    textLabel.TextColor3 = player.Team and player.TeamColor.Color or Color3.fromRGB(255, 255, 255) -
+    textLabel.TextSize = 14
+end
+
+local function removeESP(player)
+    if player.Character then
+        for _, v in pairs(player.Character:GetChildren()) do
+            if v:IsA("Highlight") or v:IsA("BillboardGui") then
+                v:Destroy()
+            end
+        end
+    end
+end
+
+local function applyESP()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= game.Players.LocalPlayer then
+            createESP(player)
+        end
+    end
+    game.Players.PlayerAdded:Connect(function(player)
+        if espEnabled then
+            player.CharacterAdded:Connect(function()
+                createESP(player)
+            end)
+        end
+    end)
+    game.Players.PlayerRemoving:Connect(function(player)
+        removeESP(player)
+    end)
+end
+
+local function removeAllESP()
+    for _, player in pairs(game.Players:GetPlayers()) do
+        removeESP(player)
+    end
+end
+
+w2:Toggle(
+    "ESP Player",
+    "espPlayer",
+    false,
+    function(toggled)
+        espEnabled = toggled
+        if espEnabled then
+            applyESP()
+        else
+            removeAllESP()
         end
     end
 )
