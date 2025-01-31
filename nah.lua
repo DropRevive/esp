@@ -140,7 +140,6 @@ w1:Toggle(
         end
     end
 )
-local w2 = library:Window("Visuals")
 
 local espEnabled = false
 
@@ -202,7 +201,7 @@ local function removeAllESP()
     end
 end
 
-w2:Toggle(
+w1:Toggle(
     "ESP Player",
     "espPlayer",
     false,
