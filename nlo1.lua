@@ -1,6 +1,6 @@
 local library = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/0x"))()
 
-local w1 = library:Window("Human") -- 更新窗口名称
+local w1 = library:Window("Simple Experience") -- 更新窗口名称
 
 w1:Slider(
     "WalkSpeed",
@@ -293,7 +293,7 @@ w1:Toggle(
     false,
     function(toggled)
         espEnabled2 = toggled
-        if espEnabled then
+        if espEnabled2 then
             searchAndApplyESP()
         else
             removeAllESP()
