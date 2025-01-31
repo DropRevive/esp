@@ -141,86 +141,14 @@ w1:Toggle(
         end
     end
 )
+local espEnabled = false
 
-local function createESP(player)
-    local highlight = Instance.new("Highlight")
-    highlight.Parent = player.Character
-    highlight.FillColor = player.Team and player.TeamColor.Color or Color3.fromRGB(255, 255, 255) -- 团队颜色或默认白色
-    highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- 外线白色
-    highlight.Adornee = player.Character
-
-    local billboard = Instance.new("BillboardGui")
-    billboard.Adornee = player.Character
-    billboard.Size = UDim2.new(0, 200, 0, 50)
-    billboard.StudsOffset = Vector3.new(0, 3, 0)
-    billboard.Parent = player.Character
-
-    local textLabel = Instance.new("TextLabel")
-    textLabel.Parent = billboard
-    textLabel.Size = UDim2.new(1, 0, 1, 0)
-    textLabel.BackgroundTransparency = 1
-    textLabel.Text = string.format("Name: %s\nDistance: %d\nTeam: %s\nHealth: %d", player.Name, (player.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude, player.Team and player.Team.Name or "None", player.Character.Humanoid.Health)
-    textLabel.Font = Enum.Font.RobotoMono
-    textLabel.TextColor3 = player.Team and player.TeamColor.Color or Color3.fromRGB(255, 255, 255) -- 团队颜色或默认白色
-    textLabel.TextSize = 14
-end
-
-local function removeESP(player)
-    if player.Character then
-        for _, v in pairs(player.Character:GetChildren()) do
-            if v:IsA("Highlight") or v:IsA("BillboardGui") then
-                v:Destroy()
-            end
-        end
-    end
-end
-
-local function applyESP()
-    for _, player in pairs(game.Players:GetPlayers()) do
-        if player ~= game.Players.LocalPlayer then
-            createESP(player)
-        end
-    end
-    game.Players.PlayerAdded:Connect(function(player)
-        if espEnabled then
-            player.CharacterAdded:Connect(function()
-                createESP(player)
-            end)
-        end
-    end)
-    game.Players.PlayerRemoving:Connect(function(player)
-        removeESP(player)
-    end)
-end
-
-local function removeAllESP()
-    for _, player in pairs(game.Players:GetPlayers()) do
-        removeESP(player)
-    end
-end
-
-w1:Toggle(
-    "ESP Player",
-    "espPlayer",
-    false,
-    function(toggled)
-        espEnabled = toggled
-        if espEnabled then
-            applyESP()
-        else
-            removeAllESP()
-        end
-    end
-)
-
-local espEnabled2 = false
-
-local function createESP2(object, infoText)
+local function createESP(object, infoText)
     local highlight = Instance.new("Highlight")
     highlight.Parent = object
-    highlight.FillColor = Color3.fromRGB(255, 255, 255) -- 默认白色
-    highlight.FillTransparency = 0.5 -- 设置填充颜色的透明度为 0.5
-    highlight.OutlineColor = Color3.fromRGB(255, 255, 255) -- 外线白色
+    highlight.FillColor = Color3.fromRGB(255, 255, 255)
+    highlight.FillTransparency = 0.5
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
     highlight.Adornee = object
 
     local billboard = Instance.new("BillboardGui")
@@ -235,31 +163,64 @@ local function createESP2(object, infoText)
     textLabel.BackgroundTransparency = 1
     textLabel.Text = infoText
     textLabel.Font = Enum.Font.RobotoMono
-    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- 默认白色
+    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     textLabel.TextSize = 14
 end
 
-local function searchAndApplyESP()
-    -- 搜索 SmileCoin 并应用 ESP
-    for _, obj in pairs(game.Workspace:GetDescendants()) do
-        if obj.Name == "SmileCoin" then
-            createESP2(obj, "SmileCoin")
-        end
-    end
+local function createPlayerESP(player)
+    local character = player.Character
+    if character then
+        local highlight = Instance.new("Highlight")
+        highlight.Parent = character
+        highlight.FillColor = player.Team and player.TeamColor.Color or Color3.fromRGB(255, 255, 255)
+        highlight.FillTransparency = 0.5
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        highlight.Adornee = character
 
-    -- 搜索 Infector 和其中的 Part 并应用 ESP
-    for _, obj in pairs(game.Workspace:GetDescendants()) do
-        if obj:IsA("Folder") and obj.Name == "Infector" then
-            for _, part in pairs(obj:GetDescendants()) do
-                if part:IsA("Part") then
-                    createESP2(part, string.format("Infector Part: %s", part.Name))
-                end
-            end
-        end
+        local billboard = Instance.new("BillboardGui")
+        billboard.Adornee = character
+        billboard.Size = UDim2.new(0, 200, 0, 50)
+        billboard.StudsOffset = Vector3.new(0, 3, 0)
+        billboard.Parent = character
+
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Parent = billboard
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.Text = string.format("Name: %s\nDistance: %d\nTeam: %s\nHealth: %d", player.Name, (character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude, player.Team and player.Team.Name or "None", character.Humanoid.Health)
+        textLabel.Font = Enum.Font.RobotoMono
+        textLabel.TextColor3 = player.Team and player.TeamColor.Color or Color3.fromRGB(255, 255, 255)
+        textLabel.TextSize = 14
     end
 end
 
-local function removeESP2(object)
+local function searchAndApplyESP1()
+    while espEnabled do
+        for _, obj in pairs(game.Workspace:GetDescendants()) do
+            if obj.Name == "SmileCoin" then
+                createESP(obj, "SmileCoin (")
+            end
+        end
+        wait(0.5)
+    end
+end
+
+local function searchAndApplyESP2()
+    while espEnabled do
+        for _, obj in pairs(game.Workspace:GetDescendants()) do
+            if obj:IsA("Folder") and obj.Name == "Infector" then
+                for _, part in pairs(obj:GetDescendants()) do
+                    if part:IsA("Part") then
+                        createESP(part, string.format("Infector BasePart: %s", part.Name))
+                    end
+                end
+            end
+        end
+        wait(0.5)
+    end
+end
+
+local function removeESP(object)
     for _, v in pairs(object:GetChildren()) do
         if v:IsA("Highlight") or v:IsA("BillboardGui") then
             v:Destroy()
@@ -268,19 +229,17 @@ local function removeESP2(object)
 end
 
 local function removeAllESP()
-    -- 移除所有 SmileCoin 的 ESP
     for _, obj in pairs(game.Workspace:GetDescendants()) do
         if obj.Name == "SmileCoin" then
-            removeESP2(obj)
+            removeESP(obj)
         end
     end
 
-    -- 移除所有 Infector 及其 Part 的 ESP
     for _, obj in pairs(game.Workspace:GetDescendants()) do
         if obj:IsA("Folder") and obj.Name == "Infector" then
             for _, part in pairs(obj:GetDescendants()) do
                 if part:IsA("Part") then
-                    removeESP2(part)
+                    removeESP(part)
                 end
             end
         end
@@ -292,11 +251,42 @@ w1:Toggle(
     "espItems",
     false,
     function(toggled)
-        espEnabled2 = toggled
-        if espEnabled2 then
-            searchAndApplyESP()
+        espEnabled = toggled
+        if espEnabled then
+            spawn(searchAndApplyESP1)
+            spawn(searchAndApplyESP2)
         else
             removeAllESP()
+        end
+    end
+)
+
+w1:Toggle(
+    "ESP Player",
+    "espPlayer",
+    false,
+    function(toggled)
+        espEnabled = toggled
+        if espEnabled then
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer then
+                    createPlayerESP(player)
+                end
+            end
+            game.Players.PlayerAdded:Connect(function(player)
+                if espEnabled then
+                    player.CharacterAdded:Connect(function()
+                        createPlayerESP(player)
+                    end)
+                end
+            end)
+            game.Players.PlayerRemoving:Connect(function(player)
+                removeESP(player)
+            end)
+        else
+            for _, player in pairs(game.Players:GetPlayers()) do
+                removeESP(player)
+            end
         end
     end
 )
