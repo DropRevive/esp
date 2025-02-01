@@ -290,45 +290,6 @@ w1:Toggle(
         end
     end
 )
-local killGateSwitcherEnabled = false
-local storedObjects = {}
-
-local function deleteKillGateSwitcher(object)
-    if object.Name == "KillGateSwitcher" and object.Parent and object.Parent.Name == "ConstantTerrain" then
-        local clone = object:Clone()
-        table.insert(storedObjects, {clone = clone, parent = object.Parent})
-        object:Destroy()
-    end
-    for _, child in ipairs(object:GetChildren()) do
-        deleteKillGateSwitcher(child)
-    end
-end
-
-local function restoreKillGateSwitcher()
-    for _, storedObject in ipairs(storedObjects) do
-        storedObject.clone.Parent = storedObject.parent
-    end
-    storedObjects = {}
-end
-
-local function applyKillGateSwitcherMovement()
-    if killGateSwitcherEnabled then
-        deleteKillGateSwitcher(game.Workspace)
-    else
-        restoreKillGateSwitcher()
-    end
-end
-
-w1:Toggle(
-    "Remove KillGateSwitcher In Workspace",
-    "removeKillGateSwitcher",
-    false,
-    function(toggled)
-        killGateSwitcherEnabled = toggled
-        applyKillGateSwitcherMovement()
-    end
-)
-
 
 local killGateSwitcherEnabled = false
 local storedKillGateSwitcherObjects = {}
@@ -398,5 +359,28 @@ w1:Toggle(
     function(toggled)
         killGateSwitcherEnabled = toggled
         applyKillGateSwitcherMovement()
+    end
+)
+
+local function findAndSetCooldown()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    local function findCooldownValues(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if child.Name == "Cooldown" then
+                child.Value = 0
+            end
+            findCooldownValues(child)
+        end
+    end
+
+    findCooldownValues(character)
+end
+
+w1:Button(
+    "Porn Cooldown",
+    function()
+        findAndSetCooldown()
     end
 )
