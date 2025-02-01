@@ -500,33 +500,37 @@ w1:Toggle(
 local bigHitboxEnabled = true
 local noAnchoredEnabled = true
 local hitboxPart = nil
-
 local function toggleBigHitbox()
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local rootPart = character:WaitForChild("HumanoidRootPart")
+    local players = game:GetService("Players")
+    
+    for _, player in ipairs(players:GetPlayers()) do
+        local character = player.Character or player.CharacterAdded:Wait()
+        local rootPart = character:WaitForChild("HumanoidRootPart")
 
-    if bigHitboxEnabled then
-        -- Create a big hidden hitbox part
-        hitboxPart = Instance.new("Part")
-        hitboxPart.Size = Vector3.new(10, 10, 10)
-        hitboxPart.Transparency = 1
-        hitboxPart.Anchored = false
-        hitboxPart.CanCollide = false
-        hitboxPart.Parent = character
+        if bigHitboxEnabled then
+            -- Create a big hidden hitbox part
+            local hitboxPart = Instance.new("Part")
+            hitboxPart.Name = "hitboxPart"
+            hitboxPart.Size = Vector3.new(10, 10, 10)
+            hitboxPart.Transparency = 1
+            hitboxPart.Anchored = false
+            hitboxPart.CanCollide = false
+            hitboxPart.Parent = character
 
-        -- Use Motor6D to attach the hitbox part to HumanoidRootPart
-        local motor = Instance.new("Motor6D")
-        motor.Part0 = rootPart
-        motor.Part1 = hitboxPart
-        motor.C0 = CFrame.new(0, 0, 0)
-        motor.Parent = rootPart
-    elseif hitboxPart then
-        hitboxPart:Destroy()
-        hitboxPart = nil
+            -- Use Motor6D to attach the hitbox part to HumanoidRootPart
+            local motor = Instance.new("Motor6D")
+            motor.Part0 = rootPart
+            motor.Part1 = hitboxPart
+            motor.C0 = CFrame.new(0, 0, 0)
+            motor.Parent = rootPart
+        else
+            local hitboxPart = character:FindFirstChild("hitboxPart")
+            if hitboxPart then
+                hitboxPart:Destroy()
+            end
+        end
     end
 end
-
 local function toggleNoAnchored()
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
