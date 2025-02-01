@@ -475,15 +475,6 @@ w1:Toggle(
     end
 )
 -- Toggle function for the hitbox
-w1:Toggle(
-    "Hitbox",
-    "bigHitbox",
-    true,
-    function(toggled)
-        bigHitboxEnabled = toggled
-        toggleBigHitbox()
-    end
-)
 
 local function addHitboxToPlayer(player)
     local character = player.Character or player.CharacterAdded:Wait()
@@ -550,15 +541,6 @@ local function toggleBigHitbox()
     end
 end
 -- Toggle function for the destroyable object
-w1:Toggle(
-    "Remove Destroyable",
-    "bigDestroyable",
-    true,
-    function(toggled)
-        bigDestroyableEnabled = toggled
-        toggleBigDestroyable()
-    end
-)
 
 local function removeAllDestroyable()
     local function removeDestroyable(object)
@@ -583,6 +565,25 @@ local function toggleBigDestroyable()
         removeAllDestroyable()
     end
 end
+w1:Toggle(
+    "Remove Destroyable",
+    "bigDestroyable",
+    true,
+    function(toggled)
+        bigDestroyableEnabled = toggled
+        toggleBigDestroyable()
+    end
+)
+
+w1:Toggle(
+    "Hitbox",
+    "bigHitbox",
+    true,
+    function(toggled)
+        bigHitboxEnabled = toggled
+        toggleBigHitbox()
+    end
+)
 local pornCooldownEnabled = false
 local removeInfectBasePartEnabled = false
 
