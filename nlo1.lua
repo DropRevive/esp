@@ -418,7 +418,10 @@ w1:Button(
     end
 )
 
+
 local killerSawEnabled = false
+local mapAntiHackRemoveEnabled = false
+local antiKickEnabled = true
 
 local function deleteKillerSaws(object)
     for _, child in ipairs(object:GetChildren()) do
@@ -429,9 +432,42 @@ local function deleteKillerSaws(object)
     end
 end
 
+local function deleteMapAntiHackRemove(object)
+    for _, child in ipairs(object:GetChildren()) do
+        if child.Name == "AntiHack" then
+            child:Destroy()
+        end
+        deleteMapAntiHackRemove(child)
+    end
+end
+
 local function checkAndRemoveKillerSaws()
     if killerSawEnabled then
         deleteKillerSaws(game.Workspace)
+    end
+end
+
+local function checkAndRemoveMapAntiHackRemove()
+    if mapAntiHackRemoveEnabled then
+        deleteMapAntiHackRemove(game.Workspace)
+    end
+end
+
+local function applyAntiKick()
+    if antiKickEnabled then
+        local mt = getrawmetatable(game)
+        local oldNamecall = mt.__namecall
+        setreadonly(mt, false)
+
+        mt.__namecall = newcclosure(function(self, ...)
+            local method = getnamecallmethod()
+            if method == "Kick" or method == "kick" then
+                return
+            end
+            return oldNamecall(self, ...)
+        end)
+
+        setreadonly(mt, true)
     end
 end
 
@@ -442,5 +478,25 @@ w1:Toggle(
     function(toggled)
         killerSawEnabled = toggled
         checkAndRemoveKillerSaws()
+    end
+)
+
+w1:Toggle(
+    "Remove AntiHack",
+    "removeMapAntiHackRemove",
+    false,
+    function(toggled)
+        mapAntiHackRemoveEnabled = toggled
+        checkAndRemoveMapAntiHackRemove()
+    end
+)
+
+w1:Toggle(
+    "Anti-Kick",
+    "antiKick",
+    true,
+    function(toggled)
+        antiKickEnabled = toggled
+        applyAntiKick()
     end
 )
