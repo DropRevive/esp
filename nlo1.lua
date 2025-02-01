@@ -667,3 +667,29 @@ w1:Toggle(
         end
     end
 )
+local removeLavaEnabled = false
+
+local function deleteLava(object)
+    for _, child in ipairs(object:GetChildren()) do
+        if child.Name == "Lava" then
+            child:Destroy()
+        end
+        deleteLava(child)
+    end
+end
+
+local function checkAndRemoveLava()
+    if removeLavaEnabled then
+        deleteLava(game.Workspace)
+    end
+end
+
+w1:Toggle(
+    "Remove Lava",
+    "removeLava",
+    false,
+    function(toggled)
+        removeLavaEnabled = toggled
+        checkAndRemoveLava()
+    end
+)
