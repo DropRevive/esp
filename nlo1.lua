@@ -497,21 +497,9 @@ w1:Toggle(
         applyAntiKick()
     end
 )
-
-local function applyInfiniteFOV()
-    local player = game.Players.LocalPlayer
-    local camera = workspace.CurrentCamera
-
-    local function setFOV()
-        if infiniteFOVEnabled then
-            camera.FieldOfView = 120
-        else
-            camera.FieldOfView = 70 -- Set back to default FOV if disabled
-        end
-    end
-
-    game:GetService("RunService").RenderStepped:Connect(setFOV)
-end
+local bigHitboxEnabled = true
+local noAnchoredEnabled = true
+local hitboxPart = nil
 
 local function toggleBigHitbox()
     local player = game.Players.LocalPlayer
@@ -527,12 +515,12 @@ local function toggleBigHitbox()
         hitboxPart.CanCollide = false
         hitboxPart.Parent = character
 
-        -- Weld the hitbox part to HumanoidRootPart
-        local weld = Instance.new("Weld")
-        weld.Part0 = rootPart
-        weld.Part1 = hitboxPart
-        weld.C0 = CFrame.new(0, 0, 0)
-        weld.Parent = rootPart
+        -- Use Motor6D to attach the hitbox part to HumanoidRootPart
+        local motor = Instance.new("Motor6D")
+        motor.Part0 = rootPart
+        motor.Part1 = hitboxPart
+        motor.C0 = CFrame.new(0, 0, 0)
+        motor.Parent = rootPart
     elseif hitboxPart then
         hitboxPart:Destroy()
         hitboxPart = nil
@@ -561,16 +549,7 @@ local function toggleNoAnchored()
 end
 
 w1:Toggle(
-    "Infinite FOV",
-    "infiniteFOV",
-    true,
-    function(toggled)
-        infiniteFOVEnabled = toggled
-    end
-)
-
-w1:Toggle(
-    "Big Hitbox",
+    "Hitbox",
     "bigHitbox",
     true,
     function(toggled)
@@ -588,5 +567,3 @@ w1:Toggle(
         toggleNoAnchored()
     end
 )
-
--- Apply Infinite FOV, Big Hitbox and No Anchored by default
