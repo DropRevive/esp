@@ -1,5 +1,5 @@
 local library = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/0x"))()
-local w1 = library:Window("Simple V2") -- 更新窗口名称
+local w1 = library:Window("Simple V2") 
 local swingBottleEnabled = false
 local swingBranchEnabled = false
 local infectEnabled = false
@@ -21,7 +21,7 @@ w1:Slider(
             end
         end)
     end,
-    22 -- 设置默认速度为 22
+    22 -
 ) -- Text, Flag, Minimum, Maximum, Callback, Default (Optional), Flag Location (Optional)
 
 w1:Slider(
@@ -540,7 +540,6 @@ local function toggleBigHitbox()
         end
     end
 end
--- Toggle function for the destroyable object
 
 local function removeAllDestroyable()
     local function removeDestroyable(object)
