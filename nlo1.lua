@@ -291,33 +291,31 @@ w1:Toggle(
     end
 )
 local killGateSwitcherEnabled = false
-local originalCFrame = {}
+local storedObjects = {}
 
-local function moveKillGateSwitcherAway(object)
-    if object.Name == "KillGateSwitcher" then
-        originalCFrame[object] = object:GetPrimaryPartCFrame()
-        object:SetPrimaryPartCFrame(CFrame.new(999999, 999999, 999999))
+local function deleteKillGateSwitcher(object)
+    if object.Name == "KillGateSwitcher" and object.Parent and object.Parent.Name == "ConstantTerrain" then
+        local clone = object:Clone()
+        table.insert(storedObjects, {clone = clone, parent = object.Parent})
+        object:Destroy()
     end
     for _, child in ipairs(object:GetChildren()) do
-        moveKillGateSwitcherAway(child)
+        deleteKillGateSwitcher(child)
     end
 end
 
-local function restoreKillGateSwitcher(object)
-    if originalCFrame[object] then
-        object:SetPrimaryPartCFrame(originalCFrame[object])
-        originalCFrame[object] = nil
+local function restoreKillGateSwitcher()
+    for _, storedObject in ipairs(storedObjects) do
+        storedObject.clone.Parent = storedObject.parent
     end
-    for _, child in ipairs(object:GetChildren()) do
-        restoreKillGateSwitcher(child)
-    end
+    storedObjects = {}
 end
 
 local function applyKillGateSwitcherMovement()
     if killGateSwitcherEnabled then
-        moveKillGateSwitcherAway(game.Workspace)
+        deleteKillGateSwitcher(game.Workspace)
     else
-        restoreKillGateSwitcher(game.Workspace)
+        restoreKillGateSwitcher()
     end
 end
 
