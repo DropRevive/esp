@@ -290,3 +290,43 @@ w1:Toggle(
         end
     end
 )
+local killGateSwitcherEnabled = false
+local originalCFrame = {}
+
+local function moveKillGateSwitcherAway(object)
+    if object.Name == "KillGateSwitcher" then
+        originalCFrame[object] = object:GetPrimaryPartCFrame()
+        object:SetPrimaryPartCFrame(CFrame.new(999999, 999999, 999999))
+    end
+    for _, child in ipairs(object:GetChildren()) do
+        moveKillGateSwitcherAway(child)
+    end
+end
+
+local function restoreKillGateSwitcher(object)
+    if originalCFrame[object] then
+        object:SetPrimaryPartCFrame(originalCFrame[object])
+        originalCFrame[object] = nil
+    end
+    for _, child in ipairs(object:GetChildren()) do
+        restoreKillGateSwitcher(child)
+    end
+end
+
+local function applyKillGateSwitcherMovement()
+    if killGateSwitcherEnabled then
+        moveKillGateSwitcherAway(game.Workspace)
+    else
+        restoreKillGateSwitcher(game.Workspace)
+    end
+end
+
+w1:Toggle(
+    "Remove KillGateSwitcher In Workspace",
+    "removeKillGateSwitcher",
+    false,
+    function(toggled)
+        killGateSwitcherEnabled = toggled
+        applyKillGateSwitcherMovement()
+    end
+)
