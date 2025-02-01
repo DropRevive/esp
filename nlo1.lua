@@ -501,32 +501,9 @@ w1:Toggle(
     end
 )
 
-local noFallEnabled = false
 local infiniteFOVEnabled = false
 local bigHitboxEnabled = false
-
-local function createPlatform()
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
-    local rootPart = character:WaitForChild("HumanoidRootPart")
-
-    local platform = Instance.new("Part")
-    platform.Size = Vector3.new(5, 1, 5)
-    platform.Transparency = 1
-    platform.Anchored = true
-    platform.CanCollide = true
-    platform.Parent = workspace
-
-    local function updatePlatform()
-        if noFallEnabled then
-            platform.Position = rootPart.Position - Vector3.new(0, 3, 0)
-        else
-            platform.Position = Vector3.new(999999, 999999, 999999) -- Move platform far away if disabled
-        end
-    end
-
-    game:GetService("RunService").RenderStepped:Connect(updatePlatform)
-end
+local hitboxPart = nil
 
 local function applyInfiniteFOV()
     local player = game.Players.LocalPlayer
@@ -534,7 +511,7 @@ local function applyInfiniteFOV()
 
     local function setFOV()
         if infiniteFOVEnabled then
-            camera.FieldOfView = math.huge
+            camera.FieldOfView = 120
         else
             camera.FieldOfView = 70 -- Set back to default FOV if disabled
         end
@@ -543,30 +520,31 @@ local function applyInfiniteFOV()
     game:GetService("RunService").RenderStepped:Connect(setFOV)
 end
 
-local function applyBigHitbox()
+local function toggleBigHitbox()
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
     local rootPart = character:WaitForChild("HumanoidRootPart")
 
-    local function setHitboxSize()
-        if bigHitboxEnabled then
-            rootPart.Size = Vector3.new(10, 10, 10)
-        else
-            rootPart.Size = Vector3.new(2, 2, 1)
-        end
-    end
+    if bigHitboxEnabled then
+        -- Create a big hidden hitbox part
+        hitboxPart = Instance.new("Part")
+        hitboxPart.Size = Vector3.new(10, 10, 10)
+        hitboxPart.Transparency = 1
+        hitboxPart.Anchored = false
+        hitboxPart.CanCollide = false
+        hitboxPart.Parent = character
 
-    game:GetService("RunService").RenderStepped:Connect(setHitboxSize)
+        -- Weld the hitbox part to HumanoidRootPart
+        local weld = Instance.new("Weld")
+        weld.Part0 = rootPart
+        weld.Part1 = hitboxPart
+        weld.C0 = CFrame.new(0, 0, 0)
+        weld.Parent = rootPart
+    elseif hitboxPart then
+        hitboxPart:Destroy()
+        hitboxPart = nil
+    end
 end
-
-w1:Toggle(
-    "No Fall",
-    "noFall",
-    true,
-    function(toggled)
-        noFallEnabled = toggled
-    end
-)
 
 w1:Toggle(
     "Infinite FOV",
@@ -578,10 +556,13 @@ w1:Toggle(
 )
 
 w1:Toggle(
-    "Hitbox(HumanoidRootPart)",
+    "Big Deal Hitbox",
     "bigHitbox",
-    false,
+    true,
     function(toggled)
         bigHitboxEnabled = toggled
+        toggleBigHitbox()
     end
 )
+
+-- Apply Infinite FOV and Big Hitbox by default
