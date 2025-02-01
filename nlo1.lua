@@ -583,3 +583,76 @@ local function toggleBigDestroyable()
         removeAllDestroyable()
     end
 end
+local pornCooldownEnabled = false
+local removeInfectBasePartEnabled = false
+
+local function checkAndRemoveHarmfulObjects()
+    local workspace = game.Workspace
+
+    local function findHarmfulObjects(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if child:IsA("Script") and child.Name == "InfectScript" then
+                child:Destroy()
+            elseif child:IsA("ParticleEmitter") and child.Name == "SmilesEmitter" then
+                child:Destroy()
+            elseif child:IsA("TouchTransmitter") and child.Name == "TouchInterest" then
+                child:Destroy()
+            elseif child:IsA("Sound") then
+                child:Destroy()
+            end
+            findHarmfulObjects(child)
+        end
+    end
+
+    findHarmfulObjects(workspace)
+end
+
+local function findAndSetCooldown()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    local function findCooldownValues(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if child.Name == "Cooldown" then
+                child.Value = 0
+            end
+            findCooldownValues(child)
+        end
+    end
+
+    findCooldownValues(character)
+end
+
+local function toggleRemoveInfectBasePart()
+    while removeInfectBasePartEnabled do
+        checkAndRemoveHarmfulObjects()
+        wait(1) -- Adjust the wait time as needed
+    end
+end
+
+local function togglePornCooldown()
+    while pornCooldownEnabled do
+        findAndSetCooldown()
+        wait(1) -- Adjust the wait time as needed
+    end
+end
+
+w1:Toggle(
+    "Remove Infect BasePart",
+    "removeInfectBasePart",
+    true,
+    function(toggled)
+        removeInfectBasePartEnabled = toggled
+        toggleRemoveInfectBasePart()
+    end
+)
+
+w1:Toggle(
+    "Porn Cooldown",
+    "pornCooldown",
+    true,
+    function(toggled)
+        pornCooldownEnabled = toggled
+        togglePornCooldown()
+    end
+)
