@@ -1,6 +1,6 @@
 local library = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/0x"))()
 
-local w1 = library:Window("Simple Experience") -- 更新窗口名称
+local w1 = library:Window("Simple V2") -- 更新窗口名称
 
 w1:Slider(
     "WalkSpeed",
@@ -382,5 +382,65 @@ w1:Button(
     "Porn Cooldown",
     function()
         findAndSetCooldown()
+    end
+)
+
+local function checkAndRemoveHarmfulObjects()
+    local workspace = game.Workspace
+
+    local function findHarmfulObjects(object)
+        local isHarmful = false
+
+        for _, child in ipairs(object:GetChildren()) do
+            if child:IsA("Script") and child.Name == "InfectScript" then
+                isHarmful = true
+            elseif child:IsA("ParticleEmitter") and child.Name == "SmilesEmitter" then
+                isHarmful = true
+                child:Destroy()
+            elseif child:IsA("TouchTransmitter") and child.Name == "TouchInterest" then
+                isHarmful = true
+                child:Destroy()
+            elseif child:IsA("Sound") then
+                isHarmful = true
+                child:Destroy()
+            end
+            findHarmfulObjects(child)
+        end
+    end
+
+    findHarmfulObjects(workspace)
+end
+
+w1:Button(
+    "Remove Infect BasePart",
+    function()
+        checkAndRemoveHarmfulObjects()
+    end
+)
+
+local killerSawEnabled = false
+
+local function deleteKillerSaws(object)
+    for _, child in ipairs(object:GetChildren()) do
+        if child.Name == "KillerSaw" then
+            child:Destroy()
+        end
+        deleteKillerSaws(child)
+    end
+end
+
+local function checkAndRemoveKillerSaws()
+    if killerSawEnabled then
+        deleteKillerSaws(game.Workspace)
+    end
+end
+
+w1:Toggle(
+    "Remove KillerSaw",
+    "removeKillerSaw",
+    false,
+    function(toggled)
+        killerSawEnabled = toggled
+        checkAndRemoveKillerSaws()
     end
 )
