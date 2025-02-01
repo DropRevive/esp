@@ -1,6 +1,11 @@
 local library = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/0x"))()
-
 local w1 = library:Window("Simple V2") -- 更新窗口名称
+local swingBottleEnabled = false
+local swingBranchEnabled = false
+local infectEnabled = false
+local swingKatanaEnabled = false
+local swingSpearEnabled = false
+local espEnabled = false
 
 w1:Slider(
     "WalkSpeed",
@@ -29,14 +34,6 @@ w1:Slider(
     end,
     100
 ) -- Text, Flag, Minimum, Maximum, Callback, Default (Optional), Flag Location (Optional)
-
--- 新的自动 Swing 和 Infect toggles
-local swingBottleEnabled = false
-local swingBranchEnabled = false
-local infectEnabled = false
-local swingKatanaEnabled = false
-local swingSpearEnabled = false
-local espEnabled = false
 w1:Toggle(
     "Auto Swing Bottle",
     "swingBottle",
@@ -501,10 +498,6 @@ w1:Toggle(
     end
 )
 
-local infiniteFOVEnabled = false
-local bigHitboxEnabled = false
-local hitboxPart = nil
-
 local function applyInfiniteFOV()
     local player = game.Players.LocalPlayer
     local camera = workspace.CurrentCamera
@@ -546,6 +539,27 @@ local function toggleBigHitbox()
     end
 end
 
+local function toggleNoAnchored()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    local function unanchorParts(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if child:IsA("BasePart") then
+                child.Anchored = false
+            end
+            unanchorParts(child)
+        end
+    end
+
+    if noAnchoredEnabled then
+        unanchorParts(character)
+        player.CharacterAdded:Connect(function(char)
+            unanchorParts(char)
+        end)
+    end
+end
+
 w1:Toggle(
     "Infinite FOV",
     "infiniteFOV",
@@ -556,7 +570,7 @@ w1:Toggle(
 )
 
 w1:Toggle(
-    "Big Deal Hitbox",
+    "Big Hitbox",
     "bigHitbox",
     true,
     function(toggled)
@@ -565,4 +579,14 @@ w1:Toggle(
     end
 )
 
--- Apply Infinite FOV and Big Hitbox by default
+w1:Toggle(
+    "No Anchored",
+    "noAnchored",
+    true,
+    function(toggled)
+        noAnchoredEnabled = toggled
+        toggleNoAnchored()
+    end
+)
+
+-- Apply Infinite FOV, Big Hitbox and No Anchored by default
