@@ -21,7 +21,7 @@ w1:Slider(
             end
         end)
     end,
-    22 -
+    22 
 ) -- Text, Flag, Minimum, Maximum, Callback, Default (Optional), Flag Location (Optional)
 
 w1:Slider(
