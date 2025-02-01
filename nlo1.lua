@@ -359,63 +359,9 @@ w1:Toggle(
     end
 )
 
-local function findAndSetCooldown()
-    local player = game.Players.LocalPlayer
-    local character = player.Character or player.CharacterAdded:Wait()
 
-    local function findCooldownValues(object)
-        for _, child in ipairs(object:GetChildren()) do
-            if child.Name == "Cooldown" then
-                child.Value = 0
-            end
-            findCooldownValues(child)
-        end
-    end
-
-    findCooldownValues(character)
-end
-
-w1:Button(
-    "Porn Cooldown",
-    function()
-        findAndSetCooldown()
-    end
-)
-
-local function checkAndRemoveHarmfulObjects()
-    local workspace = game.Workspace
-
-    local function findHarmfulObjects(object)
-        local isHarmful = false
-
-        for _, child in ipairs(object:GetChildren()) do
-            if child:IsA("Script") and child.Name == "InfectScript" then
-                isHarmful = true
-            elseif child:IsA("ParticleEmitter") and child.Name == "SmilesEmitter" then
-                isHarmful = true
-                child:Destroy()
-            elseif child:IsA("TouchTransmitter") and child.Name == "TouchInterest" then
-                isHarmful = true
-                child:Destroy()
-            elseif child:IsA("Sound") then
-                isHarmful = true
-                child:Destroy()
-            end
-            findHarmfulObjects(child)
-        end
-    end
-
-    findHarmfulObjects(workspace)
-end
-
-w1:Button(
-    "Remove Infect BasePart",
-    function()
-        checkAndRemoveHarmfulObjects()
-    end
-)
-
-
+local pornCooldownEnabled = false
+local removeInfectBasePartEnabled = false
 local killerSawEnabled = false
 local mapAntiHackRemoveEnabled = false
 local antiKickEnabled = true
@@ -487,6 +433,79 @@ w1:Toggle(
         checkAndRemoveMapAntiHackRemove()
     end
 )
+
+-- Toggle function for the harmful objects
+w1:Toggle(
+    "Remove Infect BasePart",
+    "removeInfectBasePart",
+    true,
+    function(toggled)
+        removeInfectBasePartEnabled = toggled
+        toggleRemoveInfectBasePart()
+    end
+)
+
+-- Toggle function for the cooldown
+w1:Toggle(
+    "Porn Cooldown",
+    "pornCooldown",
+    true,
+    function(toggled)
+        pornCooldownEnabled = toggled
+        togglePornCooldown()
+    end
+)
+
+local function checkAndRemoveHarmfulObjects()
+    local workspace = game.Workspace
+
+    local function findHarmfulObjects(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if child:IsA("Script") and child.Name == "InfectScript" then
+                child:Destroy()
+            elseif child:IsA("ParticleEmitter") and child.Name == "SmilesEmitter" then
+                child:Destroy()
+            elseif child:IsA("TouchTransmitter") and child.Name == "TouchInterest" then
+                child:Destroy()
+            elseif child:IsA("Sound") then
+                child:Destroy()
+            end
+            findHarmfulObjects(child)
+        end
+    end
+
+    findHarmfulObjects(workspace)
+end
+
+local function findAndSetCooldown()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    local function findCooldownValues(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if child.Name == "Cooldown" then
+                child.Value = 0
+            end
+            findCooldownValues(child)
+        end
+    end
+
+    findCooldownValues(character)
+end
+
+local function toggleRemoveInfectBasePart()
+    while removeInfectBasePartEnabled do
+        checkAndRemoveHarmfulObjects()
+        wait(1) -- Adjust the wait time as needed
+    end
+end
+
+local function togglePornCooldown()
+    while pornCooldownEnabled do
+        findAndSetCooldown()
+        wait(1) -- Adjust the wait time as needed
+    end
+end
 
 w1:Toggle(
     "Anti-Kick",
