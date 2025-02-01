@@ -605,3 +605,37 @@ local function toggleBigHitbox()
         end
     end
 end
+-- Toggle function for the destroyable object
+w1:Toggle(
+    "Remove Destroyable",
+    "bigDestroyable",
+    true,
+    function(toggled)
+        bigDestroyableEnabled = toggled
+        toggleBigDestroyable()
+    end
+)
+
+local function removeAllDestroyable()
+    local function removeDestroyable(object)
+        local destroyablePart = object:FindFirstChild("Destroyable")
+        if destroyablePart then
+            destroyablePart:Destroy()
+        end
+    end
+
+    local function recursiveRemoveDestroyable(parent)
+        for _, child in ipairs(parent:GetChildren()) do
+            removeDestroyable(child)
+            recursiveRemoveDestroyable(child)
+        end
+    end
+
+    recursiveRemoveDestroyable(game.Workspace)
+end
+
+local function toggleBigDestroyable()
+    if bigDestroyableEnabled then
+        removeAllDestroyable()
+    end
+end
