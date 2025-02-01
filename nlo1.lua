@@ -497,40 +497,9 @@ w1:Toggle(
         applyAntiKick()
     end
 )
-local bigHitboxEnabled = true
-local noAnchoredEnabled = true
+local noAnchoredEnabled = false
+local bigHitboxEnabled = false
 local hitboxPart = nil
-local function toggleBigHitbox()
-    local players = game:GetService("Players")
-    
-    for _, player in ipairs(players:GetPlayers()) do
-        local character = player.Character or player.CharacterAdded:Wait()
-        local rootPart = character:WaitForChild("HumanoidRootPart")
-
-        if bigHitboxEnabled then
-            -- Create a big hidden hitbox part
-            local hitboxPart = Instance.new("Part")
-            hitboxPart.Name = "hitboxPart"
-            hitboxPart.Size = Vector3.new(10, 10, 10)
-            hitboxPart.Transparency = 1
-            hitboxPart.Anchored = false
-            hitboxPart.CanCollide = false
-            hitboxPart.Parent = character
-
-            -- Use Motor6D to attach the hitbox part to HumanoidRootPart
-            local motor = Instance.new("Motor6D")
-            motor.Part0 = rootPart
-            motor.Part1 = hitboxPart
-            motor.C0 = CFrame.new(0, 0, 0)
-            motor.Parent = rootPart
-        else
-            local hitboxPart = character:FindFirstChild("hitboxPart")
-            if hitboxPart then
-                hitboxPart:Destroy()
-            end
-        end
-    end
-end
 local function toggleNoAnchored()
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
@@ -553,6 +522,16 @@ local function toggleNoAnchored()
 end
 
 w1:Toggle(
+    "No Anchored",
+    "noAnchored",
+    true,
+    function(toggled)
+        noAnchoredEnabled = toggled
+        toggleNoAnchored()
+    end
+)
+-- Toggle function for the hitbox
+w1:Toggle(
     "Hitbox",
     "bigHitbox",
     true,
@@ -562,12 +541,67 @@ w1:Toggle(
     end
 )
 
-w1:Toggle(
-    "No Anchored",
-    "noAnchored",
-    true,
-    function(toggled)
-        noAnchoredEnabled = toggled
-        toggleNoAnchored()
+local function addHitboxToPlayer(player)
+    local character = player.Character or player.CharacterAdded:Wait()
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+
+    if bigHitboxEnabled then
+        local hitboxPart = Instance.new("Part")
+        hitboxPart.Name = "hitboxPart"
+        hitboxPart.Size = Vector3.new(10, 10, 10)
+        hitboxPart.Transparency = 1
+        hitboxPart.Anchored = false
+        hitboxPart.CanCollide = false
+        hitboxPart.Parent = character
+
+        local motor = Instance.new("Motor6D")
+        motor.Part0 = rootPart
+        motor.Part1 = hitboxPart
+        motor.C0 = CFrame.new(0, 0, 0)
+        motor.Parent = rootPart
     end
-)
+end
+
+local function removeHitboxFromPlayer(player)
+    local character = player.Character or player.CharacterAdded:Wait()
+    local hitboxPart = character:FindFirstChild("hitboxPart")
+    if hitboxPart then
+        hitboxPart:Destroy()
+    end
+end
+
+local function checkPlayerTeam(player)
+    local localPlayer = game:GetService("Players").LocalPlayer
+    if player.Team ~= localPlayer.Team then
+        addHitboxToPlayer(player)
+    else
+        removeHitboxFromPlayer(player)
+    end
+end
+
+local function toggleBigHitbox()
+    local players = game:GetService("Players")
+
+    if bigHitboxEnabled then
+        for _, player in ipairs(players:GetPlayers()) do
+            checkPlayerTeam(player)
+        end
+
+        players.PlayerAdded:Connect(function(player)
+            checkPlayerTeam(player)
+            player:GetPropertyChangedSignal("Team"):Connect(function()
+                checkPlayerTeam(player)
+            end)
+        end)
+
+        game:GetService("Players").LocalPlayer:GetPropertyChangedSignal("Team"):Connect(function()
+            for _, player in ipairs(players:GetPlayers()) do
+                checkPlayerTeam(player)
+            end
+        end)
+    else
+        for _, player in ipairs(players:GetPlayers()) do
+            removeHitboxFromPlayer(player)
+        end
+    end
+end
