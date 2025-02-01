@@ -500,3 +500,88 @@ w1:Toggle(
         applyAntiKick()
     end
 )
+
+local noFallEnabled = false
+local infiniteFOVEnabled = false
+local bigHitboxEnabled = false
+
+local function createPlatform()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+
+    local platform = Instance.new("Part")
+    platform.Size = Vector3.new(5, 1, 5)
+    platform.Transparency = 1
+    platform.Anchored = true
+    platform.CanCollide = true
+    platform.Parent = workspace
+
+    local function updatePlatform()
+        if noFallEnabled then
+            platform.Position = rootPart.Position - Vector3.new(0, 3, 0)
+        else
+            platform.Position = Vector3.new(999999, 999999, 999999) -- Move platform far away if disabled
+        end
+    end
+
+    game:GetService("RunService").RenderStepped:Connect(updatePlatform)
+end
+
+local function applyInfiniteFOV()
+    local player = game.Players.LocalPlayer
+    local camera = workspace.CurrentCamera
+
+    local function setFOV()
+        if infiniteFOVEnabled then
+            camera.FieldOfView = math.huge
+        else
+            camera.FieldOfView = 70 -- Set back to default FOV if disabled
+        end
+    end
+
+    game:GetService("RunService").RenderStepped:Connect(setFOV)
+end
+
+local function applyBigHitbox()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+
+    local function setHitboxSize()
+        if bigHitboxEnabled then
+            rootPart.Size = Vector3.new(10, 10, 10)
+        else
+            rootPart.Size = Vector3.new(2, 2, 1)
+        end
+    end
+
+    game:GetService("RunService").RenderStepped:Connect(setHitboxSize)
+end
+
+w1:Toggle(
+    "No Fall",
+    "noFall",
+    true,
+    function(toggled)
+        noFallEnabled = toggled
+    end
+)
+
+w1:Toggle(
+    "Infinite FOV",
+    "infiniteFOV",
+    true,
+    function(toggled)
+        infiniteFOVEnabled = toggled
+    end
+)
+
+w1:Toggle(
+    "Hitbox(HumanoidRootPart)",
+    "bigHitbox",
+    false,
+    function(toggled)
+        bigHitboxEnabled = toggled
+    end
+)
