@@ -584,28 +584,38 @@ w1:Toggle(
         toggleBigHitbox()
     end
 )
-local pornCooldownEnabled = false
 local removeInfectBasePartEnabled = false
+local pornCooldownEnabled = false
 
 local function checkAndRemoveHarmfulObjects()
     local workspace = game.Workspace
 
     local function findHarmfulObjects(object)
         for _, child in ipairs(object:GetChildren()) do
-            if child:IsA("Script") and child.Name == "InfectScript" then
-                child:Destroy()
-            elseif child:IsA("ParticleEmitter") and child.Name == "SmilesEmitter" then
-                child:Destroy()
-            elseif child:IsA("TouchTransmitter") and child.Name == "TouchInterest" then
-                child:Destroy()
-            elseif child:IsA("Sound") then
-                child:Destroy()
+            if removeInfectBasePartEnabled then
+                if child:IsA("Script") and child.Name == "InfectScript" then
+                    child:Destroy()
+                elseif child:IsA("ParticleEmitter") and child.Name == "SmilesEmitter" then
+                    child:Destroy()
+                elseif child:IsA("TouchTransmitter") and child.Name == "TouchInterest" then
+                    child:Destroy()
+                elseif child:IsA("Sound") then
+                    child:Destroy()
+                end
+                findHarmfulObjects(child)
             end
-            findHarmfulObjects(child)
         end
     end
 
     findHarmfulObjects(workspace)
+
+    if removeInfectBasePartEnabled then
+        workspace.ChildAdded:Connect(function(child)
+            if removeInfectBasePartEnabled then
+                findHarmfulObjects(child)
+            end
+        end)
+    end
 end
 
 local function findAndSetCooldown()
@@ -614,27 +624,23 @@ local function findAndSetCooldown()
 
     local function findCooldownValues(object)
         for _, child in ipairs(object:GetChildren()) do
-            if child.Name == "Cooldown" then
-                child.Value = 0
+            if pornCooldownEnabled then
+                if child.Name == "Cooldown" then
+                    child.Value = 0
+                end
+                findCooldownValues(child)
             end
-            findCooldownValues(child)
         end
     end
 
     findCooldownValues(character)
-end
 
-local function toggleRemoveInfectBasePart()
-    while removeInfectBasePartEnabled do
-        checkAndRemoveHarmfulObjects()
-        wait(1) -- Adjust the wait time as needed
-    end
-end
-
-local function togglePornCooldown()
-    while pornCooldownEnabled do
-        findAndSetCooldown()
-        wait(1) -- Adjust the wait time as needed
+    if pornCooldownEnabled then
+        character.ChildAdded:Connect(function(child)
+            if pornCooldownEnabled then
+                findCooldownValues(child)
+            end
+        end)
     end
 end
 
@@ -644,7 +650,9 @@ w1:Toggle(
     true,
     function(toggled)
         removeInfectBasePartEnabled = toggled
-        toggleRemoveInfectBasePart()
+        if toggled then
+            checkAndRemoveHarmfulObjects()
+        end
     end
 )
 
@@ -654,6 +662,8 @@ w1:Toggle(
     true,
     function(toggled)
         pornCooldownEnabled = toggled
-        togglePornCooldown()
+        if toggled then
+            findAndSetCooldown()
+        end
     end
 )
