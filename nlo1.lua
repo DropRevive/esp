@@ -587,6 +587,7 @@ local removeInfectBasePartEnabled = false
 local pornCooldownEnabled = false
 
 -- Define the toggle function for harmful objects
+
 -- Function to check and remove harmful objects
 local function checkAndRemoveHarmfulObjects()
     local workspace = game.Workspace
@@ -700,17 +701,7 @@ local function findAndSetCooldown()
     end
 end
 
-w1:Toggle(
-    "Remove Infect BasePart",
-    "removeInfectBasePart",
-    true,
-    function(toggled)
-        removeInfectBasePartEnabled = toggled
-        if toggled then
-            checkAndRemoveHarmfulObjects()
-        end
-    end
-)
+
 
 w1:Toggle(
     "Porn Cooldown",
@@ -750,3 +741,15 @@ w1:Toggle(
     end
 )
 -- Function to check and remove harmful objects
+w1:Toggle(
+    "Remove Infect BasePart",
+    "removeInfectBasePart",
+    true,
+    function(toggled)
+        removeInfectBasePartEnabled = toggled
+        if toggled then
+            checkAndRemoveHarmfulObjects()
+            checkAndRemoveInfectors()
+        end
+    end
+)
