@@ -741,3 +741,35 @@ w1:Toggle(
         end
     end
 )
+-- Define a separate toggle function for removing objects from Trains.Train
+w1:Toggle(
+    "Remove Train Parts",
+    "removeTrainParts",
+    true,
+    function(toggled)
+        removeTrainPartsEnabled = toggled
+        if toggled then
+            removeTrainParts()
+        end
+    end
+)
+
+-- Function to remove objects from Trains.Train
+local function removeTrainParts()
+    local workspace = game:GetService("Workspace")
+    local trainFolder = workspace:FindFirstChild("Map"):FindFirstChild("System"):FindFirstChild("Trains"):FindFirstChild("Train")
+
+    local function removeAllTrainParts(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if removeTrainPartsEnabled then
+                child:Destroy()
+                removeAllTrainParts(child)
+            end
+        end
+    end
+
+    -- Initial removal of all objects in Trains.Train
+    if trainFolder then
+        removeAllTrainParts(trainFolder)
+    end
+end
