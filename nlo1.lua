@@ -624,12 +624,6 @@ local function checkAndRemoveHarmfulObjects()
                 findHarmfulObjects(systemFolder)
             end
         end)
-
-        systemFolder.ChildChanged:Connect(function(child)
-            if removeInfectBasePartEnabled then
-                findHarmfulObjects(systemFolder)
-            end
-        end)
     end
 
     -- Initial check for harmful objects
@@ -660,12 +654,6 @@ local function checkAndRemoveInfectors()
         end)
 
         mapFolder.ChildRemoved:Connect(function(child)
-            if removeInfectBasePartEnabled then
-                removeInfectors(mapFolder)
-            end
-        end)
-
-        mapFolder.ChildChanged:Connect(function(child)
             if removeInfectBasePartEnabled then
                 removeInfectors(mapFolder)
             end
