@@ -453,6 +453,124 @@ Toggles.AntiInfectBase:OnChanged(function(toggled)
         checkAndRemoveInfectors()
     end
 end)
+local pornCooldownEnabled = false
+
+local function findAndSetCooldown()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+
+    local function findCooldownValues(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if pornCooldownEnabled then
+                if child.Name == "Cooldown" then
+                    child.Value = 0
+                end
+                findCooldownValues(child)
+            end
+        end
+    end
+
+    findCooldownValues(character)
+
+    if pornCooldownEnabled then
+        character.ChildAdded:Connect(function(child)
+            if pornCooldownEnabled then
+                findCooldownValues(child)
+            end
+        end)
+    end
+end
+
+-- Toggle function for enabling/disabling the cooldown removal
+
+RightGroupBox:AddToggle("PornCooldowns", {
+    Text = "Porn Cooldowns",
+    Default = true,
+})
+
+Toggles.PornCooldowns:OnChanged(function(toggled)
+    pornCooldownEnabled = toggled
+    if toggled then
+        findAndSetCooldown()
+    end
+end)
+local removeTrainPartsEnabled = false
+
+local function removeTrainParts()
+    local workspace = game:GetService("Workspace")
+    local trainFolder = workspace:FindFirstChild("Map"):FindFirstChild("System"):FindFirstChild("Trains"):FindFirstChild("Train")
+
+    local function removeAllTrainParts(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if removeTrainPartsEnabled then
+                child:Destroy()
+                removeAllTrainParts(child)
+            end
+        end
+    end
+
+    -- Initial removal of all objects in Trains.Train
+    if trainFolder then
+        removeAllTrainParts(trainFolder)
+    end
+end
+
+local function toggleRemoveTrainParts(toggled)
+    removeTrainPartsEnabled = toggled
+    if toggled then
+        removeTrainParts()
+    end
+end
+
+-- Adding toggle button in the UI
+RightGroupBox:AddToggle("RemoveTrainParts", {
+    Text = "Remove Train",
+    Default = false,
+})
+
+Toggles.RemoveTrainParts:OnChanged(function(toggled)
+    toggleRemoveTrainParts(toggled)
+end)
+local autoFarmEnabled = false
+
+local function autoFarmSmileCoins()
+    local workspace = game.Workspace
+    local players = game:GetService("Players")
+    local player = players.LocalPlayer
+    local targetCFrame = player.Character and player.Character.PrimaryPart.CFrame or CFrame.new(0, 0, 0)
+
+    local function findAndTeleportSmileCoins(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if child.Name == "SmileCoin" and child:IsA("BasePart") then
+                child.CFrame = targetCFrame
+            end
+            findAndTeleportSmileCoins(child)
+        end
+    end
+
+    findAndTeleportSmileCoins(workspace)
+end
+
+local function toggleAutoFarmSmileCoins(toggled)
+    autoFarmEnabled = toggled
+    if autoFarmEnabled then
+        spawn(function()
+            while autoFarmEnabled do
+                autoFarmSmileCoins()
+                wait(1) -- Add a delay to prevent potential performance issues
+            end
+        end)
+    end
+end
+
+RightGroupBox:AddToggle("AutoFarmSmileCoins", {
+    Text = "Auto Farm SmileCoins",
+    Default = false,
+})
+
+Toggles.AutoFarmSmileCoins:OnChanged(function(toggled)
+    toggleAutoFarmSmileCoins(toggled)
+end)
 local MenuGroup = Tabs.Lol:AddLeftGroupbox("Menu")
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
