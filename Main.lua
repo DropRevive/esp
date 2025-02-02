@@ -191,15 +191,22 @@ Toggles.Infect:OnChanged(function(toggled)
             while infectEnabled do
                 local player = game.Players.LocalPlayer
                 local character = player.Character
-                if character and character:FindFirstChild("Infected") and character.Infected:FindFirstChild("InfectEvent") then
-                    character.Infected.InfectEvent:FireServer()
+                if character then
+                    if character:FindFirstChild("Infected") and character.Infected:FindFirstChild("InfectEvent") then
+                        character.Infected.InfectEvent:FireServer()
+                    end
+
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")
+                    if humanoid and humanoid.Health < 0 then
+                        humanoid.RigType = Enum.HumanoidRigType.R15
+                        player.CharacterAppearance = "http://www.roblox.com/Asset/CharacterFetch.ashx?userId=" .. player.UserId .. "&type=R15"
+                    end
                 end
                 wait(0.1)
             end
         end)
     end
 end)
-
 LeftGroupBox:AddToggle("SwingKatana", {
     Text = "Swing Katana",
     Default = true,
