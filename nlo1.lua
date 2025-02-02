@@ -589,34 +589,36 @@ local pornCooldownEnabled = false
 local function checkAndRemoveHarmfulObjects()
     local workspace = game.Workspace
 
-    local function findAndRemoveParent(object)
+    local function findAndRemoveHarmfulObjects(object)
         local harmfulFound = false
         for _, child in ipairs(object:GetChildren()) do
             if removeInfectBasePartEnabled then
                 if child:IsA("Script") and child.Name == "InfectScript" then
+                    child:Destroy()
                     harmfulFound = true
                 elseif child:IsA("ParticleEmitter") and child.Name == "SmilesEmitter" then
+                    child:Destroy()
                     harmfulFound = true
                 elseif child:IsA("TouchTransmitter") and child.Name == "TouchInterest" then
+                    child:Destroy()
                     harmfulFound = true
                 elseif child:IsA("Sound") then
+                    child:Destroy()
                     harmfulFound = true
                 end
-                
-                -- If harmful object is found, remove the parent
-                if harmfulFound and child.Parent then
-                    child.Parent:Destroy()
-                end
-
-                findAndRemoveParent(child)
+                findAndRemoveHarmfulObjects(child)
             end
         end
+        return harmfulFound
     end
 
     -- Continuously check and remove harmful objects until none are left
     while removeInfectBasePartEnabled do
-        findAndRemoveParent(workspace)
-        wait(1)
+        local harmfulFound = findAndRemoveHarmfulObjects(workspace)
+        if not harmfulFound then
+            break
+        end
+        wait(1) -- Adjust the wait time as needed
     end
 end
 local function findAndSetCooldown()
