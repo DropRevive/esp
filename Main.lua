@@ -39,6 +39,41 @@ local Tabs = {
 
 local LeftGroupBox = Tabs.Main:AddLeftGroupbox("Automatic")
 
+local LeftGroupBox2 = Tabs.Main:AddLeftGroupbox("LocalSetting")
+
+LeftGroupBox2:AddSlider("SpeedSlider", {
+    Text = "Set Speed",
+    Default = 22,
+    Min = 20,
+    Max = 30,
+    Rounding = 1,
+    Compact = false,
+
+    Tooltip = "Adjust the speed of the slide.",
+    DisabledTooltip = "Slider is disabled!",
+    Disabled = false,
+    Visible = true,
+})
+
+Options.SpeedSlider:OnChanged(function()
+    local player = game.Players.LocalPlayer
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = Options.SpeedSlider.Value
+    end
+end)
+
+local function maintainSpeed()
+    while true do
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = Options.SpeedSlider.Value
+        end
+        wait(0.1)
+    end
+end
+
+spawn(maintainSpeed)
+
 LeftGroupBox:AddToggle("1", {
     Text = "Swing Branch",
     Tooltip = "...",
