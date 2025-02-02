@@ -2,6 +2,7 @@ local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local swingBrEnabled = false
 local swingBottleEnabled = false
 local swingBranchEnabled = false
 local infectEnabled = false
@@ -19,6 +20,7 @@ local removeInfectBasePartEnabled = false
 local pornCooldownEnabled = false
 local removeLavaEnabled = false
 local removeTrainPartsEnabled = false
+local strongBatEnabled = false
 local Options = Library.Options
 local Toggles = Library.Toggles
 Library.ForceCheckbox = false
@@ -75,7 +77,7 @@ end
 spawn(maintainSpeed)
 
 LeftGroupBox:AddToggle("1", {
-    Text = "Swing Branch",
+    Text = "Swing Bat",
     Tooltip = "...",
     DisabledTooltip = "...",
 
@@ -86,14 +88,14 @@ LeftGroupBox:AddToggle("1", {
 })
 
 Toggles["1"]:OnChanged(function(toggled)
-    swingBranchEnabled = toggled
-    if swingBranchEnabled then
+    swingBrEnabled = toggled
+    if swingBrEnabled then
         spawn(function()
             while swingBranchEnabled do
                 local player = game.Players.LocalPlayer
                 local character = player.Character
-                if character and character:FindFirstChild("Branch") and character.Branch:FindFirstChild("SwingEvent") then
-                    character.Branch.SwingEvent:FireServer()
+                if character and character:FindFirstChild("Bat") and character.Branch:FindFirstChild("SwingEvent") then
+                    character.Bat.SwingEvent:FireServer()
                 end
                 wait(0.1)
             end
@@ -142,7 +144,41 @@ Toggles.SwingBottle:OnChanged(function(toggled)
         end)
     end
 end)
+LeftGroupBox:AddToggle("StrongBat", {
+    Text = "Strong Bat",
+    Default = true,
+})
 
+Toggles.StrongBat:OnChanged(function(toggled)
+    strongBatEnabled = toggled
+    if strongBatEnabled then
+        spawn(function()
+            while strongBatEnabled do
+                local player = game.Players.LocalPlayer
+                local character = player.Character
+
+                if character then
+                    -- Ensure player has a Bat
+                    if character:FindFirstChild("Bat") then
+                        local bat = character:FindFirstChild("Bat")
+
+                        -- Check and set Cooldown
+                        if bat:FindFirstChild("Cooldown") then
+                            bat.Cooldown.Value = 1
+                        end
+
+                        -- Adjust V3's size
+                        if bat:FindFirstChild("V3") then
+                            bat.V3.Size = Vector3.new(3.5, 9, 3.5)
+                        end
+                    end
+                end
+
+                wait(0.1)
+            end
+        end)
+    end
+end)
 LeftGroupBox:AddToggle("Infect", {
     Text = "Infect",
     Default = true,
