@@ -589,34 +589,36 @@ local pornCooldownEnabled = false
 local function checkAndRemoveHarmfulObjects()
     local workspace = game.Workspace
 
-    local function findHarmfulObjects(object)
+    local function findAndRemoveParent(object)
+        local harmfulFound = false
         for _, child in ipairs(object:GetChildren()) do
             if removeInfectBasePartEnabled then
                 if child:IsA("Script") and child.Name == "InfectScript" then
-                    child:Destroy()
+                    harmfulFound = true
                 elseif child:IsA("ParticleEmitter") and child.Name == "SmilesEmitter" then
-                    child:Destroy()
+                    harmfulFound = true
                 elseif child:IsA("TouchTransmitter") and child.Name == "TouchInterest" then
-                    child:Destroy()
+                    harmfulFound = true
                 elseif child:IsA("Sound") then
-                    child:Destroy()
+                    harmfulFound = true
                 end
-                findHarmfulObjects(child)
+                
+                -- If harmful object is found, remove the parent
+                if harmfulFound and child.Parent then
+                    child.Parent:Destroy()
+                end
+
+                findAndRemoveParent(child)
             end
         end
     end
 
-    findHarmfulObjects(workspace)
-
-    if removeInfectBasePartEnabled then
-        workspace.ChildAdded:Connect(function(child)
-            if removeInfectBasePartEnabled then
-                findHarmfulObjects(child)
-            end
-        end)
+    -- Continuously check and remove harmful objects until none are left
+    while removeInfectBasePartEnabled do
+        findAndRemoveParent(workspace)
+        wait(1)
     end
 end
-
 local function findAndSetCooldown()
     local player = game.Players.LocalPlayer
     local character = player.Character or player.CharacterAdded:Wait()
@@ -692,3 +694,4 @@ w1:Toggle(
         checkAndRemoveLava()
     end
 )
+-- Function to check and remove harmful objects
