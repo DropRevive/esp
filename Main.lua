@@ -172,28 +172,6 @@ Toggles.SwingSpear:OnChanged(function(toggled)
         end)
     end
 end)
-local RightGroupBox = Tabs.Man:AddRightGroupbox("Remove/ Exploit")
-
-RightGroupBox:AddToggle("KillerSaw", {
-    Text = "Remove Killer Saws",
-    Default = false,
-})
-
-Toggles.KillerSaw:OnChanged(function(toggled)
-    killerSawEnabled = toggled
-    checkAndRemoveKillerSaws()
-end)
-
-RightGroupBox:AddToggle("MapAntiHackRemove", {
-    Text = "Remove AntiHack",
-    Default = false,
-})
-
-Toggles.MapAntiHackRemove:OnChanged(function(toggled)
-    mapAntiHackRemoveEnabled = toggled
-    checkAndRemoveMapAntiHackRemove()
-end)
-
 local function deleteKillerSaws(object)
     for _, child in ipairs(object:GetChildren()) do
         if child.Name == "KillerSaw" then
@@ -224,7 +202,27 @@ local function checkAndRemoveMapAntiHackRemove()
     end
 end
 
+local RightGroupBox = Tabs.Man:AddRightGroupbox("Remove/ Exploit")
 
+RightGroupBox:AddToggle("KillerSaw", {
+    Text = "Remove Killer Saws",
+    Default = false,
+})
+
+Toggles.KillerSaw:OnChanged(function(toggled)
+    killerSawEnabled = toggled
+    checkAndRemoveKillerSaws()
+end)
+
+RightGroupBox:AddToggle("MapAntiHackRemove", {
+    Text = "Remove AntiHack",
+    Default = false,
+})
+
+Toggles.MapAntiHackRemove:OnChanged(function(toggled)
+    mapAntiHackRemoveEnabled = toggled
+    checkAndRemoveMapAntiHackRemove()
+end)
 
 RightGroupBox:AddToggle("AntiKick", {
     Text = "Enable AntiKick",
@@ -274,12 +272,12 @@ local function toggleNoAnchored()
     end
 end
 
-RightGroupBox:AddToggle("999", {
+RightGroupBox:AddToggle("lol", {
     Text = "No Anchored",
     Default = true,
 })
 
-Toggles.999:OnChanged(function(toggled)
+Toggles.lol:OnChanged(function(toggled)
     noAnchoredEnabled = toggled
     toggleNoAnchored()
 end)
@@ -327,12 +325,12 @@ local function toggleBigDestroyable()
     end
 end
 
-RightGroupBox:AddToggle("111", {
+RightGroupBox:AddToggle("sm", {
     Text = "Remove Destroyable",
     Default = true,
 })
 
-Toggles.111:OnChanged(function(toggled)
+Toggles.sm:OnChanged(function(toggled)
     bigDestroyableEnabled = toggled
     removeAllDestroyable()
 end)
