@@ -213,6 +213,9 @@ Toggles.Infect:OnChanged(function(toggled)
                         if humanoid then
                             if humanoid.Health < 0 then
                                 humanoid.RigType = Enum.HumanoidRigType.R15
+				wait(1)
+
+				table.remove(infectedPlayers, index)
                             end
                         end
                     end
