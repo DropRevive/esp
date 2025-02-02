@@ -372,7 +372,6 @@ local function checkAndRemoveHarmfulObjects()
     findHarmfulObjects(systemFolder)
 end
 
--- Function to check and remove all Infectors
 local function checkAndRemoveInfectors()
     local workspace = game.Workspace
     local mapFolder = workspace:FindFirstChild("Map")
@@ -406,13 +405,13 @@ local function checkAndRemoveInfectors()
     removeInfectors(mapFolder)
 end
 
-RightGroupBox:AddToggle("1111", {
+RightGroupBox:AddToggle("AntiInfectBase", {
     Text = "Anti Infect Base",
     Default = true,
 })
 
-Toggles.1111:OnChanged(function(toggled)
-   removeInfectBasePartEnabled = toggled
+Toggles.AntiInfectBase:OnChanged(function(toggled)
+    removeInfectBasePartEnabled = toggled
     if toggled then
         checkAndRemoveHarmfulObjects()
         checkAndRemoveInfectors()
