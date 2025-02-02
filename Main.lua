@@ -297,6 +297,72 @@ RightGroupBox:AddToggle("AntiKick", {
     Default = true,
 })
 
+local function deleteKillGateSwitcher(object)
+    if object.Name == "KillGateSwitcher" then
+        local clone = object:Clone()
+        table.insert(storedKillGateSwitcherObjects, {clone = clone, parent = object.Parent})
+        object:Destroy()
+    end
+    for _, child in ipairs(object:GetChildren()) do
+        deleteKillGateSwitcher(child)
+    end
+end
+
+local function deleteGates(object)
+    if object.Name == "Gate" then
+        local clone = object:Clone()
+        table.insert(storedGateObjects, {clone = clone, parent = object.Parent})
+        object:Destroy()
+    end
+    for _, child in ipairs(object:GetChildren()) do
+        deleteGates(child)
+    end
+end
+
+local function deleteGatesInInfectGateSwitch(object)
+    if object.Name == "InfectGateSwitch" or object.Name == "KillGateSwitcher" then
+        for _, child in ipairs(object:GetChildren()) do
+            deleteGates(child)
+        end
+    end
+    for _, child in ipairs(object:GetChildren()) do
+        deleteGatesInInfectGateSwitch(child)
+    end
+end
+
+local function restoreKillGateSwitcher()
+    for _, storedObject in ipairs(storedKillGateSwitcherObjects) do
+        storedObject.clone.Parent = storedObject.parent
+    end
+    storedKillGateSwitcherObjects = {}
+end
+
+local function restoreGates()
+    for _, storedObject in ipairs(storedGateObjects) do
+        storedObject.clone.Parent = storedObject.parent
+    end
+    storedGateObjects = {}
+end
+
+local function applyKillGateSwitcherMovement()
+    if killGateSwitcherEnabled then
+        deleteKillGateSwitcher(game.Workspace)
+        deleteGatesInInfectGateSwitch(game.Workspace)
+    else
+        restoreKillGateSwitcher()
+        restoreGates()
+    end
+end
+
+RightGroupBox:AddToggle("AntiKillInfectGate", {
+    Text = "Anti Kill / Infect Gate",
+    Default = false,
+})
+
+Toggles.AntiKillInfectGate:OnChanged(function(toggled)
+    killGateSwitcherEnabled = toggled
+    applyKillGateSwitcherMovement()
+end)
 Toggles.AntiKick:OnChanged(function(toggled)
     antiKickEnabled = toggled
     applyAntiKick()
