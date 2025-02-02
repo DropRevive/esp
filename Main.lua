@@ -202,7 +202,7 @@ local function checkAndRemoveMapAntiHackRemove()
     end
 end
 
-local RightGroupBox = Tabs.Man:AddRightGroupbox("Remove/ Exploit")
+local RightGroupBox = Tabs.Main:AddRightGroupbox("Remove/ Exploit")
 
 RightGroupBox:AddToggle("KillerSaw", {
     Text = "Remove Killer Saws",
