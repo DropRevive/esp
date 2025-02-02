@@ -673,6 +673,30 @@ RightGroupBox:AddToggle("AutoFarmSmileCoins", {
 Toggles.AutoFarmSmileCoins:OnChanged(function(toggled)
     toggleAutoFarmSmileCoins(toggled)
 end)
+local function deleteLava(object)
+    for _, child in ipairs(object:GetChildren()) do
+        if child.Name == "Lava" then
+            child:Destroy()
+        end
+        deleteLava(child)
+    end
+end
+
+local function checkAndRemoveLava()
+    if removeLavaEnabled then
+        deleteLava(game.Workspace)
+    end
+end
+
+LeftGroupBox:AddToggle("AntiLava", {
+    Text = "Anti Lava",
+    Default = false,
+})
+
+Toggles.AntiLava:OnChanged(function(toggled)
+    removeLavaEnabled = toggled
+    checkAndRemoveLava()
+end)
 local MenuGroup = Tabs.Lol:AddLeftGroupbox("Menu")
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
