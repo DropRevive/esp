@@ -586,40 +586,93 @@ w1:Toggle(
 local removeInfectBasePartEnabled = false
 local pornCooldownEnabled = false
 
+-- Define the toggle function for harmful objects
+-- Function to check and remove harmful objects
 local function checkAndRemoveHarmfulObjects()
     local workspace = game.Workspace
+    local systemFolder = workspace:FindFirstChild("Map"):FindFirstChild("System")
 
-    local function findAndRemoveHarmfulObjects(object)
-        local harmfulFound = false
+    local function findHarmfulObjects(object)
         for _, child in ipairs(object:GetChildren()) do
             if removeInfectBasePartEnabled then
                 if child:IsA("Script") and child.Name == "InfectScript" then
                     child:Destroy()
-                    harmfulFound = true
                 elseif child:IsA("ParticleEmitter") and child.Name == "SmilesEmitter" then
                     child:Destroy()
-                    harmfulFound = true
                 elseif child:IsA("TouchTransmitter") and child.Name == "TouchInterest" then
                     child:Destroy()
-                    harmfulFound = true
                 elseif child:IsA("Sound") then
                     child:Destroy()
-                    harmfulFound = true
+                elseif child.Name == "Infectors" then
+                    child:Destroy()
                 end
-                findAndRemoveHarmfulObjects(child)
+                findHarmfulObjects(child)
             end
         end
-        return harmfulFound
     end
 
-    -- Continuously check and remove harmful objects until none are left
-    while removeInfectBasePartEnabled do
-        local harmfulFound = findAndRemoveHarmfulObjects(workspace)
-        if not harmfulFound then
-            break
-        end
-        wait(1) -- Adjust the wait time as needed
+    if systemFolder then
+        systemFolder.ChildAdded:Connect(function(child)
+            if removeInfectBasePartEnabled then
+                findHarmfulObjects(systemFolder)
+            end
+        end)
+
+        systemFolder.ChildRemoved:Connect(function(child)
+            if removeInfectBasePartEnabled then
+                findHarmfulObjects(systemFolder)
+            end
+        end)
+
+        systemFolder.ChildChanged:Connect(function(child)
+            if removeInfectBasePartEnabled then
+                findHarmfulObjects(systemFolder)
+            end
+        end)
     end
+
+    -- Initial check for harmful objects
+    findHarmfulObjects(systemFolder)
+end
+
+-- Function to check and remove all Infectors
+local function checkAndRemoveInfectors()
+    local workspace = game.Workspace
+    local mapFolder = workspace:FindFirstChild("Map")
+
+    local function removeInfectors(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if removeInfectBasePartEnabled then
+                if child.Name == "Infectors" then
+                    child:Destroy()
+                end
+                removeInfectors(child)
+            end
+        end
+    end
+
+    if mapFolder then
+        mapFolder.ChildAdded:Connect(function(child)
+            if removeInfectBasePartEnabled then
+                removeInfectors(mapFolder)
+            end
+        end)
+
+        mapFolder.ChildRemoved:Connect(function(child)
+            if removeInfectBasePartEnabled then
+                removeInfectors(mapFolder)
+            end
+        end)
+
+        mapFolder.ChildChanged:Connect(function(child)
+            if removeInfectBasePartEnabled then
+                removeInfectors(mapFolder)
+            end
+        end)
+    end
+
+    -- Initial check and removal of all Infectors
+    removeInfectors(mapFolder)
 end
 local function findAndSetCooldown()
     local player = game.Players.LocalPlayer
