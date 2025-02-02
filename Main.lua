@@ -179,6 +179,7 @@ Toggles.StrongBat:OnChanged(function(toggled)
         end)
     end
 end)
+-- 定义感染功能的切换
 LeftGroupBox:AddToggle("Infect", {
     Text = "Infect",
     Default = true,
@@ -196,10 +197,17 @@ Toggles.Infect:OnChanged(function(toggled)
                         character.Infected.InfectEvent:FireServer()
                     end
 
-                    local humanoid = character:FindFirstChildOfClass("Humanoid")
-                    if humanoid and humanoid.Health < 0 then
-                        humanoid.RigType = Enum.HumanoidRigType.R15
-                        player.CharacterAppearance = "http://www.roblox.com/Asset/CharacterFetch.ashx?userId=" .. player.UserId .. "&type=R15"
+                    -- 检查所有玩家的健康状态
+                    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+                        local otherCharacter = otherPlayer.Character
+                        if otherCharacter then
+                            local humanoid = otherCharacter:FindFirstChildOfClass("Humanoid")
+                            if humanoid and humanoid.Health < 0 then
+                                -- 将玩家的模型类型更改为R15
+                                humanoid.RigType = Enum.HumanoidRigType.R15
+                                otherPlayer.CharacterAppearance = "http://www.roblox.com/Asset/CharacterFetch.ashx?userId=" .. otherPlayer.UserId .. "&type=R15"
+                            end
+                        end
                     end
                 end
                 wait(0.1)
