@@ -179,10 +179,13 @@ Toggles.StrongBat:OnChanged(function(toggled)
         end)
     end
 end)
+-- 定义感染功能的切换
 LeftGroupBox:AddToggle("Infect", {
     Text = "Infect",
     Default = true,
 })
+
+-- 创建一个表来存储被感染的玩家
 local infectedPlayers = {}
 
 Toggles.Infect:OnChanged(function(toggled)
@@ -195,21 +198,41 @@ Toggles.Infect:OnChanged(function(toggled)
                 if character and character:FindFirstChild("Infected") and character.Infected:FindFirstChild("InfectEvent") then
                     character.Infected.InfectEvent:FireServer()
 
-                    
-                    if not table.find(infectedPlayers, player) and character:FindFirstChildOfClass("Humanoid").Health ~= 0 then
-                        table.insert(infectedPlayers, player)
+                    -- 找到距离最近且受感染的玩家
+                    local closestPlayer = nil
+                    local closestDistance = math.huge
+                    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+                        if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                            local distance = (character.HumanoidRootPart.Position - otherPlayer.Character.HumanoidRootPart.Position).magnitude
+                            if distance < closestDistance then
+                                closestPlayer = otherPlayer
+                                closestDistance = distance
+                            end
+                        end
+                    end
+
+                    -- 将受感染的最近玩家加入列表
+                    if closestPlayer and not table.find(infectedPlayers, closestPlayer) then
+                        table.insert(infectedPlayers, closestPlayer)
                     end
                 end
 
-                
+                -- 无限循环修改列表中健康值为0或介于0到35之间玩家的RigType
                 for index, infectedPlayer in ipairs(infectedPlayers) do
                     local infectedCharacter = infectedPlayer.Character
                     if infectedCharacter then
                         local humanoid = infectedCharacter:FindFirstChildOfClass("Humanoid")
                         if humanoid then
-                            if humanoid.Health < 0 then
-                                humanoid.RigType = Enum.HumanoidRigType.R15
-                            elseif humanoid.Health == 0 then
+                            if humanoid.Health == 0 or (humanoid.Health > 0 and humanoid.Health < 35) then
+                                -- 先切换到R15，然后切换回R6
+                                while true do
+                                    humanoid.RigType = Enum.HumanoidRigType.R15
+                                    wait(0.1)
+                                    humanoid.RigType = Enum.HumanoidRigType.R6
+                                    wait(0.1)
+                                end
+                            end
+                            if humanoid.Health == 0 then
                                 table.remove(infectedPlayers, index)
                             end
                         end
