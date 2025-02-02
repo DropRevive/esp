@@ -179,14 +179,10 @@ Toggles.StrongBat:OnChanged(function(toggled)
         end)
     end
 end)
--- 定义感染功能的切换
--- 定义感染功能的切换
 LeftGroupBox:AddToggle("Infect", {
     Text = "Infect",
     Default = true,
 })
-
--- 创建一个表来存储被感染的玩家
 local infectedPlayers = {}
 
 Toggles.Infect:OnChanged(function(toggled)
@@ -199,13 +195,13 @@ Toggles.Infect:OnChanged(function(toggled)
                 if character and character:FindFirstChild("Infected") and character.Infected:FindFirstChild("InfectEvent") then
                     character.Infected.InfectEvent:FireServer()
 
-                    -- 将受感染的玩家加入列表，且只有健康值不为0时才加入
+                    
                     if not table.find(infectedPlayers, player) and character:FindFirstChildOfClass("Humanoid").Health ~= 0 then
                         table.insert(infectedPlayers, player)
                     end
                 end
 
-                -- 无限循环修改列表中生命值小于零玩家的RigType为R15
+                
                 for index, infectedPlayer in ipairs(infectedPlayers) do
                     local infectedCharacter = infectedPlayer.Character
                     if infectedCharacter then
@@ -213,9 +209,8 @@ Toggles.Infect:OnChanged(function(toggled)
                         if humanoid then
                             if humanoid.Health < 0 then
                                 humanoid.RigType = Enum.HumanoidRigType.R15
-				wait(1)
-
-				table.remove(infectedPlayers, index)
+                            elseif humanoid.Health == 0 then
+                                table.remove(infectedPlayers, index)
                             end
                         end
                     end
