@@ -274,13 +274,154 @@ local function toggleNoAnchored()
     end
 end
 
-RightGroupBox:AddToggle("AntiKick", {
+RightGroupBox:AddToggle("999", {
     Text = "No Anchored",
     Default = true,
 })
 
-Toggles.AntiKick:OnChanged(function(toggled)
+Toggles.999:OnChanged(function(toggled)
     noAnchoredEnabled = toggled
-    applyAntiKick()
+    toggleNoAnchored()
 end)
 
+local function removeAllDestroyable()
+    local function removeDestroyable(object)
+        local destroyablePart = object:FindFirstChild("Destroyable")
+        if destroyablePart then
+            destroyablePart:Destroy()
+        end
+    end
+
+    local function recursiveRemoveDestroyable(parent)
+        for _, child in ipairs(parent:GetChildren()) do
+            removeDestroyable(child)
+            recursiveRemoveDestroyable(child)
+        end
+    end
+
+    recursiveRemoveDestroyable(game.Workspace)
+end
+
+
+local function removeAllDestroyable()
+    local function removeDestroyable(object)
+        local destroyablePart = object:FindFirstChild("Destroyable")
+        if destroyablePart then
+            destroyablePart:Destroy()
+        end
+    end
+
+    local function recursiveRemoveDestroyable(parent)
+        for _, child in ipairs(parent:GetChildren()) do
+            removeDestroyable(child)
+            recursiveRemoveDestroyable(child)
+        end
+    end
+
+    recursiveRemoveDestroyable(game.Workspace)
+end
+
+local function toggleBigDestroyable()
+    if bigDestroyableEnabled then
+        removeAllDestroyable()
+    end
+end
+
+RightGroupBox:AddToggle("111", {
+    Text = "Remove Destroyable",
+    Default = true,
+})
+
+Toggles.111:OnChanged(function(toggled)
+    bigDestroyableEnabled = toggled
+    removeAllDestroyable()
+end)
+
+-- Function to check and remove harmful objects
+local function checkAndRemoveHarmfulObjects()
+    local workspace = game.Workspace
+    local systemFolder = workspace:FindFirstChild("Map"):FindFirstChild("System")
+
+    local function findHarmfulObjects(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if removeInfectBasePartEnabled then
+                if child:IsA("Script") and child.Name == "InfectScript" then
+                    child:Destroy()
+                elseif child:IsA("ParticleEmitter") and child.Name == "SmilesEmitter" then
+                    child:Destroy()
+                elseif child:IsA("TouchTransmitter") and child.Name == "TouchInterest" then
+                    child:Destroy()
+                elseif child:IsA("Sound") then
+                    child:Destroy()
+                elseif child.Name == "Infectors" then
+                    child:Destroy()
+                end
+                findHarmfulObjects(child)
+            end
+        end
+    end
+
+    if systemFolder then
+        systemFolder.ChildAdded:Connect(function(child)
+            if removeInfectBasePartEnabled then
+                findHarmfulObjects(systemFolder)
+            end
+        end)
+
+        systemFolder.ChildRemoved:Connect(function(child)
+            if removeInfectBasePartEnabled then
+                findHarmfulObjects(systemFolder)
+            end
+        end)
+    end
+
+    -- Initial check for harmful objects
+    findHarmfulObjects(systemFolder)
+end
+
+-- Function to check and remove all Infectors
+local function checkAndRemoveInfectors()
+    local workspace = game.Workspace
+    local mapFolder = workspace:FindFirstChild("Map")
+
+    local function removeInfectors(object)
+        for _, child in ipairs(object:GetChildren()) do
+            if removeInfectBasePartEnabled then
+                if child.Name == "Infectors" then
+                    child:Destroy()
+                end
+                removeInfectors(child)
+            end
+        end
+    end
+
+    if mapFolder then
+        mapFolder.ChildAdded:Connect(function(child)
+            if removeInfectBasePartEnabled then
+                removeInfectors(mapFolder)
+            end
+        end)
+
+        mapFolder.ChildRemoved:Connect(function(child)
+            if removeInfectBasePartEnabled then
+                removeInfectors(mapFolder)
+            end
+        end)
+    end
+
+    -- Initial check and removal of all Infectors
+    removeInfectors(mapFolder)
+end
+
+RightGroupBox:AddToggle("1111", {
+    Text = "Anti Infect Base",
+    Default = true,
+})
+
+Toggles.1111:OnChanged(function(toggled)
+   removeInfectBasePartEnabled = toggled
+    if toggled then
+        checkAndRemoveHarmfulObjects()
+        checkAndRemoveInfectors()
+    end
+end)
