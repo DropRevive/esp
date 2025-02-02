@@ -94,7 +94,7 @@ Toggles["1"]:OnChanged(function(toggled)
             while swingBranchEnabled do
                 local player = game.Players.LocalPlayer
                 local character = player.Character
-                if character and character:FindFirstChild("Bat") and character.Branch:FindFirstChild("SwingEvent") then
+                if character and character:FindFirstChild("Bat") and character.Bat:FindFirstChild("SwingEvent") then
                     character.Bat.SwingEvent:FireServer()
                 end
                 wait(0.1)
@@ -180,10 +180,14 @@ Toggles.StrongBat:OnChanged(function(toggled)
     end
 end)
 -- 定义感染功能的切换
+-- 定义感染功能的切换
 LeftGroupBox:AddToggle("Infect", {
     Text = "Infect",
     Default = true,
 })
+
+-- 创建一个表来存储被感染的玩家
+local infectedPlayers = {}
 
 Toggles.Infect:OnChanged(function(toggled)
     infectEnabled = toggled
@@ -192,24 +196,28 @@ Toggles.Infect:OnChanged(function(toggled)
             while infectEnabled do
                 local player = game.Players.LocalPlayer
                 local character = player.Character
-                if character then
-                    if character:FindFirstChild("Infected") and character.Infected:FindFirstChild("InfectEvent") then
-                        character.Infected.InfectEvent:FireServer()
-                    end
+                if character and character:FindFirstChild("Infected") and character.Infected:FindFirstChild("InfectEvent") then
+                    character.Infected.InfectEvent:FireServer()
 
-                    -- 检查所有玩家的健康状态
-                    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
-                        local otherCharacter = otherPlayer.Character
-                        if otherCharacter then
-                            local humanoid = otherCharacter:FindFirstChildOfClass("Humanoid")
-                            if humanoid and humanoid.Health < 0 then
-                                -- 将玩家的模型类型更改为R15
+                    -- 将受感染的玩家加入列表，且只有健康值不为0时才加入
+                    if not table.find(infectedPlayers, player) and character:FindFirstChildOfClass("Humanoid").Health ~= 0 then
+                        table.insert(infectedPlayers, player)
+                    end
+                end
+
+                -- 无限循环修改列表中生命值小于零玩家的RigType为R15
+                for index, infectedPlayer in ipairs(infectedPlayers) do
+                    local infectedCharacter = infectedPlayer.Character
+                    if infectedCharacter then
+                        local humanoid = infectedCharacter:FindFirstChildOfClass("Humanoid")
+                        if humanoid then
+                            if humanoid.Health < 0 then
                                 humanoid.RigType = Enum.HumanoidRigType.R15
-                                otherPlayer.CharacterAppearance = "http://www.roblox.com/Asset/CharacterFetch.ashx?userId=" .. otherPlayer.UserId .. "&type=R15"
                             end
                         end
                     end
                 end
+
                 wait(0.1)
             end
         end)
