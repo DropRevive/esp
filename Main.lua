@@ -124,6 +124,26 @@ Toggles.SwingBranch:OnChanged(function(toggled)
     end
 end)
 
+LeftGroupBox:AddToggle("SwingBranch", {
+    Text = "Swing Chain",
+    Default = false,
+})
+
+Toggles.SwingBranch:OnChanged(function(toggled)
+    swingBranchEnabled = toggled
+    if swingBranchEnabled then
+        spawn(function()
+            while swingBranchEnabled do
+                local player = game.Players.LocalPlayer
+                local character = player.Character
+                if character and character:FindFirstChild("Chain") and character.Chain:FindFirstChild("SwingEvent") then
+                    character.Chain.SwingEvent:FireServer()
+                end
+                wait(0.1)
+            end
+        end)
+    end
+end)
 LeftGroupBox:AddToggle("SwingBottle", {
     Text = "Swing Bottle",
     Default = true,
