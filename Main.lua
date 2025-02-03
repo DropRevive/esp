@@ -202,7 +202,7 @@ end)
 local LocalPlayer = game.Players.LocalPlayer
 
 LeftGroupBox:AddToggle("Infect", {
-    Text = "Infect ON DEATH [TEST!!!]",
+    Text = "Infect ON DEATH [TEST!!!!]",
     Default = true,
 })
 
@@ -216,6 +216,7 @@ local function triggerDeathByRigType(player)
 
     humanoid.HealthChanged:Connect(function()
         if humanoid.Health <= 0 then
+            print(player.Name .. " has died.")
             Hh.KK[player] = nil
         end
     end)
@@ -241,9 +242,9 @@ local function infectPlayer(player)
     end
 end
 
-local function findClosestPlayer(player)
+local function findClosestPlayerInRange(player, range)
     local closestPlayer = nil
-    local minDist = math.huge
+    local minDist = range
     local currentPos = player.Character:FindFirstChild("HumanoidRootPart") and player.Character.HumanoidRootPart.Position
 
     if currentPos then
@@ -297,9 +298,9 @@ Toggles.Infect:OnChanged(function(toggled)
                         if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
                             break
                         end
-                        
+
                         if infectEvent and not Hh.KK[player] then
-                            local closestPlayer = findClosestPlayer(player)
+                            local closestPlayer = findClosestPlayerInRange(player, 5)  -- 5 units range
                             if closestPlayer then
                                 pcall(function()
                                     infectEvent:FireServer()
