@@ -204,24 +204,70 @@ LeftGroupBox:AddToggle("Infect", {
     Text = "Infect",
     Default = true,
 })
-local infectedPlayers = {}
-
+local Hh = { KK = {}, Running = false }
 Toggles.Infect:OnChanged(function(toggled)
-    infectEnabled = toggled
-    if infectEnabled then
+    Hh.Running = false 
+    wait(0.15)
+    if toggled then 
+        Hh.Running = true 
         spawn(function()
-            while infectEnabled do
-                local player = game.Players.LocalPlayer
-                local character = player.Character
-                if character and character:FindFirstChild("Infected") and character.Infected:FindFirstChild("InfectEvent") then
-                    character.Infected.InfectEvent:FireServer()
+            local LL = game:GetService("RunService").Heartbeat 
+            while Hh.Running do 
+                local OO = game.Players.LocalPlayer 
+                if not OO.Character then continue end 
+                local PP = OO.Character:FindFirstChild("Infected")
+                if PP and PP:FindFirstChild("InfectEvent") then 
+                    local QQ = game.Players:GetPlayers()
+                    local currentPos = OO.Character:FindFirstChild("HumanoidRootPart") and OO.Character.HumanoidRootPart.Position 
+                    Hh.KK[OO] = true 
+                    local closestPlayer, minDist 
+                    for _, player in ipairs(QQ) do 
+                        if player == OO then continue end 
+                        if Hh.KK[player] then continue end 
+                        local chr = player.Character 
+                        local root = chr and chr:FindFirstChild("HumanoidRootPart")
+                        if not root then continue end 
+                        local dist = currentPos and (root.Position - currentPos).magnitude or math.huge 
+                        if not minDist or dist < minDist then 
+                            closestPlayer = player 
+                            minDist = dist 
+                        end 
+                    end 
+                    if closestPlayer then 
+                        pcall(function() PP.InfectEvent:FireServer() end)
+                        Hh.KK[closestPlayer] = true 
+                        closestPlayer.Team = game.Teams:FindFirstChild("Smiling") or closestPlayer.Team 
+                    end 
                 end
-                wait(0.1)
-            end
+                for i = #Hh.KK, 1, -1 do 
+                    local player = next(Hh.KK, i == 0 and nil or i)
+                    if not player or not player.Character then 
+                        Hh.KK[player] = nil 
+                        continue 
+                    end 
+                    local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+                    if not humanoid then continue end 
+                    if humanoid.Health <= 0 then 
+                        Hh.KK[player] = nil 
+                    else 
+                        if humanoid.Health < 35 then 
+                            spawn(function()
+                                pcall(function()
+                                    humanoid.RigType = Enum.HumanoidRigType.R15 
+                                    wait(0.15)
+                                    humanoid.RigType = Enum.HumanoidRigType.R6 
+                                end)
+                            end)
+                        end 
+                    end 
+                end 
+ 
+                LL:Wait()
+            end 
+            Hh.KK = {}
         end)
-    end
+    end 
 end)
-
 LeftGroupBox:AddToggle("SwingKatana", {
     Text = "Swing Katana",
     Default = true,
