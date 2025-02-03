@@ -81,7 +81,7 @@ LeftGroupBox:AddToggle("1", {
     Tooltip = "...",
     DisabledTooltip = "...",
 
-    Default = true,
+    Default = false,
     Disabled = false,
     Visible = true,
     Risky = false,
@@ -105,7 +105,7 @@ end)
 
 LeftGroupBox:AddToggle("SwingBranch", {
     Text = "Swing Branch",
-    Default = true,
+    Default = false,
 })
 
 Toggles.SwingBranch:OnChanged(function(toggled)
@@ -146,7 +146,7 @@ Toggles.SwingBranch:OnChanged(function(toggled)
 end)
 LeftGroupBox:AddToggle("SwingBottle", {
     Text = "Swing Bottle",
-    Default = true,
+    Default = false,
 })
 
 Toggles.SwingBottle:OnChanged(function(toggled)
@@ -166,7 +166,7 @@ Toggles.SwingBottle:OnChanged(function(toggled)
 end)
 LeftGroupBox:AddToggle("StrongBat", {
     Text = "Strong Bat",
-    Default = true,
+    Default = false,
 })
 
 Toggles.StrongBat:OnChanged(function(toggled)
@@ -202,7 +202,7 @@ end)
 
 LeftGroupBox:AddToggle("Infect", {
     Text = "Infect On Death [Test]",
-    Default = true,
+    Default = false,
 })
 
 local Hh = { KK = {}, Running = false }
@@ -339,7 +339,7 @@ Toggles.Infect:OnChanged(function(toggled)
 end)
 LeftGroupBox:AddToggle("SwingKatana", {
     Text = "Swing Katana",
-    Default = true,
+    Default = false,
 })
 
 Toggles.SwingKatana:OnChanged(function(toggled)
@@ -360,7 +360,7 @@ end)
 
 LeftGroupBox:AddToggle("SwingSpear", {
     Text = "Swing Spear",
-    Default = true,
+    Default = false,
 })
 
 Toggles.SwingSpear:OnChanged(function(toggled)
@@ -431,7 +431,7 @@ end)
 
 RightGroupBox:AddToggle("AntiKick", {
     Text = "Enable AntiKick",
-    Default = true,
+    Default = false,
 })
 
 local function deleteKillGateSwitcher(object)
@@ -545,7 +545,7 @@ end
 
 RightGroupBox:AddToggle("lol", {
     Text = "No Anchored",
-    Default = true,
+    Default = false,
 })
 
 Toggles.lol:OnChanged(function(toggled)
@@ -598,7 +598,7 @@ end
 
 RightGroupBox:AddToggle("sm", {
     Text = "Remove Destroyable",
-    Default = true,
+    Default = false,
 })
 
 Toggles.sm:OnChanged(function(toggled)
@@ -682,7 +682,7 @@ end
 
 RightGroupBox:AddToggle("AntiInfectBase", {
     Text = "Anti Infect Base",
-    Default = true,
+    Default = false,
 })
 
 Toggles.AntiInfectBase:OnChanged(function(toggled)
@@ -724,7 +724,7 @@ end
 
 RightGroupBox:AddToggle("PornCooldowns", {
     Text = "Porn Cooldowns",
-    Default = true,
+    Default = false,
 })
 
 Toggles.PornCooldowns:OnChanged(function(toggled)
