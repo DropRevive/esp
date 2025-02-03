@@ -43,20 +43,6 @@ local LeftGroupBox = Tabs.Main:AddLeftGroupbox("Automatic")
 
 local LeftGroupBox2 = Tabs.Main:AddLeftGroupbox("LocalSetting")
 
-LeftGroupBox2:AddSlider("SpeedSlider", {
-    Text = "Set Speed",
-    Default = 22,
-    Min = 20,
-    Max = 30,
-    Rounding = 1,
-    Compact = false,
-
-    Tooltip = "Adjust the speed of the slide.",
-    DisabledTooltip = "Slider is disabled!",
-    Disabled = false,
-    Visible = true,
-})
-
 Options.SpeedSlider:OnChanged(function()
     local player = game.Players.LocalPlayer
     if player.Character and player.Character:FindFirstChild("Humanoid") then
@@ -76,16 +62,6 @@ end
 
 spawn(maintainSpeed)
 
-LeftGroupBox:AddToggle("1", {
-    Text = "Swing Bat",
-    Tooltip = "...",
-    DisabledTooltip = "...",
-
-    Default = true,
-    Disabled = false,
-    Visible = true,
-    Risky = false,
-})
 
 Toggles["1"]:OnChanged(function(toggled)
     swingBrEnabled = toggled
@@ -103,10 +79,6 @@ Toggles["1"]:OnChanged(function(toggled)
     end
 end)
 
-LeftGroupBox:AddToggle("SwingBranch", {
-    Text = "Swing Branch",
-    Default = true,
-})
 
 Toggles.SwingBranch:OnChanged(function(toggled)
     swingBranchEnabled = toggled
@@ -124,10 +96,6 @@ Toggles.SwingBranch:OnChanged(function(toggled)
     end
 end)
 
-LeftGroupBox:AddToggle("SwingBranch", {
-    Text = "Swing Chain",
-    Default = false,
-})
 
 Toggles.SwingBranch:OnChanged(function(toggled)
     swingBranchEnabled = toggled
@@ -144,10 +112,6 @@ Toggles.SwingBranch:OnChanged(function(toggled)
         end)
     end
 end)
-LeftGroupBox:AddToggle("SwingBottle", {
-    Text = "Swing Bottle",
-    Default = true,
-})
 
 Toggles.SwingBottle:OnChanged(function(toggled)
     swingBottleEnabled = toggled
@@ -164,10 +128,6 @@ Toggles.SwingBottle:OnChanged(function(toggled)
         end)
     end
 end)
-LeftGroupBox:AddToggle("StrongBat", {
-    Text = "Strong Bat",
-    Default = true,
-})
 
 Toggles.StrongBat:OnChanged(function(toggled)
     strongBatEnabled = toggled
@@ -200,10 +160,6 @@ Toggles.StrongBat:OnChanged(function(toggled)
     end
 end)
 
-LeftGroupBox:AddToggle("Infect", {
-    Text = "Infect",
-    Default = true,
-})
 local infectedPlayers = {}
 
 Toggles.Infect:OnChanged(function(toggled)
@@ -222,11 +178,6 @@ Toggles.Infect:OnChanged(function(toggled)
     end
 end)
 
-LeftGroupBox:AddToggle("SwingKatana", {
-    Text = "Swing Katana",
-    Default = true,
-})
-
 Toggles.SwingKatana:OnChanged(function(toggled)
     swingKatanaEnabled = toggled
     if swingKatanaEnabled then
@@ -243,10 +194,6 @@ Toggles.SwingKatana:OnChanged(function(toggled)
     end
 end)
 
-LeftGroupBox:AddToggle("SwingSpear", {
-    Text = "Swing Spear",
-    Default = true,
-})
 
 Toggles.SwingSpear:OnChanged(function(toggled)
     swingSpearEnabled = toggled
@@ -294,30 +241,17 @@ local function checkAndRemoveMapAntiHackRemove()
 end
 
 local RightGroupBox = Tabs.Main:AddRightGroupbox("Exploit")
-RightGroupBox:AddToggle("KillerSaw", {
-    Text = "Remove Killer Saws",
-    Default = false,
-})
 
 Toggles.KillerSaw:OnChanged(function(toggled)
     killerSawEnabled = toggled
     checkAndRemoveKillerSaws()
 end)
 
-RightGroupBox:AddToggle("MapAntiHackRemove", {
-    Text = "Remove AntiHack",
-    Default = false,
-})
 
 Toggles.MapAntiHackRemove:OnChanged(function(toggled)
     mapAntiHackRemoveEnabled = toggled
     checkAndRemoveMapAntiHackRemove()
 end)
-
-RightGroupBox:AddToggle("AntiKick", {
-    Text = "Enable AntiKick",
-    Default = true,
-})
 
 local function deleteKillGateSwitcher(object)
     if object.Name == "KillGateSwitcher" then
@@ -376,10 +310,6 @@ local function applyKillGateSwitcherMovement()
     end
 end
 
-RightGroupBox:AddToggle("AntiKillInfectGate", {
-    Text = "Anti Kill / Infect Gate",
-    Default = false,
-})
 
 Toggles.AntiKillInfectGate:OnChanged(function(toggled)
     killGateSwitcherEnabled = toggled
@@ -428,10 +358,6 @@ local function toggleNoAnchored()
     end
 end
 
-RightGroupBox:AddToggle("lol", {
-    Text = "No Anchored",
-    Default = true,
-})
 
 Toggles.lol:OnChanged(function(toggled)
     noAnchoredEnabled = toggled
@@ -480,11 +406,6 @@ local function toggleBigDestroyable()
         removeAllDestroyable()
     end
 end
-
-RightGroupBox:AddToggle("sm", {
-    Text = "Remove Destroyable",
-    Default = true,
-})
 
 Toggles.sm:OnChanged(function(toggled)
     bigDestroyableEnabled = toggled
@@ -565,11 +486,6 @@ local function checkAndRemoveInfectors()
     removeInfectors(mapFolder)
 end
 
-RightGroupBox:AddToggle("AntiInfectBase", {
-    Text = "Anti Infect Base",
-    Default = true,
-})
-
 Toggles.AntiInfectBase:OnChanged(function(toggled)
     removeInfectBasePartEnabled = toggled
     if toggled then
@@ -607,11 +523,6 @@ end
 
 -- Toggle function for enabling/disabling the cooldown removal
 
-RightGroupBox:AddToggle("PornCooldowns", {
-    Text = "Porn Cooldowns",
-    Default = true,
-})
-
 Toggles.PornCooldowns:OnChanged(function(toggled)
     pornCooldownEnabled = toggled
     if toggled then
@@ -647,10 +558,6 @@ local function toggleRemoveTrainParts(toggled)
 end
 
 -- Adding toggle button in the UI
-RightGroupBox:AddToggle("RemoveTrainParts", {
-    Text = "Remove Train",
-    Default = false,
-})
 
 Toggles.RemoveTrainParts:OnChanged(function(toggled)
     toggleRemoveTrainParts(toggled)
@@ -687,10 +594,6 @@ local function toggleAutoFarmSmileCoins(toggled)
     end
 end
 
-RightGroupBox:AddToggle("AutoFarmSmileCoins", {
-    Text = "Auto Farm SmileCoins",
-    Default = false,
-})
 
 Toggles.AutoFarmSmileCoins:OnChanged(function(toggled)
     toggleAutoFarmSmileCoins(toggled)
@@ -710,15 +613,78 @@ local function checkAndRemoveLava()
     end
 end
 
-LeftGroupBox:AddToggle("AntiLava", {
-    Text = "Anti Lava",
-    Default = false,
-})
 
 Toggles.AntiLava:OnChanged(function(toggled)
     removeLavaEnabled = toggled
     checkAndRemoveLava()
 end)
+local isEnglish = true
+
+local toggles = {
+    AntiLava = {Text = {en = "Anti Lava", zh = "抗岩浆"}, Default = false},
+    AutoFarmSmileCoins = {Text = {en = "Auto Farm SmileCoins", zh = "自动获取微笑币"}, Default = false},
+    RemoveTrainParts = {Text = {en = "Remove Train", zh = "移除火车部件"}, Default = false},
+    PornCooldowns = {Text = {en = "Porn Cooldowns", zh = "色情冷却时间"}, Default = true},
+    AntiInfectBase = {Text = {en = "Anti Infect Base", zh = "抗感染基地"}, Default = true},
+    sm = {Text = {en = "Remove Destroyable", zh = "移除可破坏物"}, Default = true},
+    lol = {Text = {en = "No Anchored", zh = "无锚定"}, Default = true},
+    AntiKillInfectGate = {Text = {en = "Anti Kill / Infect Gate", zh = "抗杀/感染门"}, Default = false},
+    AntiKick = {Text = {en = "Enable AntiKick", zh = "启用抗踢"}, Default = true},
+    MapAntiHackRemove = {Text = {en = "Remove AntiHack", zh = "移除反作弊"}, Default = false},
+    KillerSaw = {Text = {en = "Remove Killer Saws", zh = "移除杀人锯"}, Default = false},
+    SwingSpear = {Text = {en = "Swing Spear", zh = "挥动矛"}, Default = true},
+    SwingKatana = {Text = {en = "Swing Katana", zh = "挥动武士刀"}, Default = true},
+    Infect = {Text = {en = "Infect", zh = "感染"}, Default = true},
+    StrongBat = {Text = {en = "Strong Bat", zh = "强力球棒"}, Default = true},
+    SwingBottle = {Text = {en = "Swing Bottle", zh = "挥动瓶子"}, Default = true},
+    SwingChain = {Text = {en = "Swing Chain", zh = "挥动链条"}, Default = false},
+    SwingBranch = {Text = {en = "Swing Branch", zh = "挥动树枝"}, Default = true},
+    SwingBat = {Text = {en = "Swing Bat", zh = "挥动球棒"}, Default = true}
+}
+
+local function updateToggleText(toggle, lang)
+    toggle:SetText(toggles[toggle.Name].Text[lang])
+end
+
+local function createToggle(parent, name, lang)
+    local toggle = parent:AddToggle(name, {
+        Text = toggles[name].Text[lang],
+        Default = toggles[name].Default
+    })
+    toggle.Name = name
+    return toggle
+end
+
+for _, toggleName in ipairs({"AntiLava", "SwingBranch", "SwingBat", "Infect"}) do
+    createToggle(LeftGroupBox, toggleName, isEnglish and "en" or "zh")
+end
+
+for _, toggleName in ipairs({"AutoFarmSmileCoins", "RemoveTrainParts", "PornCooldowns", "AntiInfectBase", "sm", "lol", "AntiKillInfectGate", "AntiKick", "MapAntiHackRemove", "KillerSaw"}) do
+    createToggle(RightGroupBox, toggleName, isEnglish and "en" or "zh")
+end
+
+-- 语言切换功能
+DropdownGroupBox:AddDropdown("LanguageDropdown", {
+    Values = { "English", "中文" },
+    Default = 1, -- 默认值为英文
+    Multi = false, -- 不允许多选
+
+    Text = "Language",
+    Tooltip = "Select the language", -- 鼠标悬停时显示的提示信息
+    DisabledTooltip = "Dropdown is disabled!", -- 下拉框被禁用时显示的提示信息
+
+    Searchable = false, -- 使下拉框可搜索
+
+    Callback = function(Value)
+        isEnglish = (Value == "English")
+        for _, toggle in pairs(Toggles) do
+            updateToggleText(toggle, isEnglish and "en" or "zh")
+        end
+    end,
+
+    Disabled = false, -- 禁用下拉框
+    Visible = true, -- 显示下拉框
+})
 local MenuGroup = Tabs.Lol:AddLeftGroupbox("Menu")
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
