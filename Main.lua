@@ -201,72 +201,141 @@ Toggles.StrongBat:OnChanged(function(toggled)
 end)
 
 LeftGroupBox:AddToggle("Infect", {
-    Text = "Infect",
+    Text = "Infect On Death [Test]",
     Default = true,
 })
+
 local Hh = { KK = {}, Running = false }
-Toggles.Infect:OnChanged(function(toggled)
-    Hh.Running = false 
-    wait(0.15)
-    if toggled then 
-        Hh.Running = true 
-        spawn(function()
-            local LL = game:GetService("RunService").Heartbeat 
-            while Hh.Running do 
-                local OO = game.Players.LocalPlayer 
-                if not OO.Character then continue end 
-                local PP = OO.Character:FindFirstChild("Infected")
-                if PP and PP:FindFirstChild("InfectEvent") then 
-                    local QQ = game.Players:GetPlayers()
-                    local currentPos = OO.Character:FindFirstChild("HumanoidRootPart") and OO.Character.HumanoidRootPart.Position 
-                    Hh.KK[OO] = true 
-                    local closestPlayer, minDist 
-                    for _, player in ipairs(QQ) do 
-                        if player == OO then continue end 
-                        if Hh.KK[player] then continue end 
-                        local chr = player.Character 
-                        local root = chr and chr:FindFirstChild("HumanoidRootPart")
-                        if not root then continue end 
-                        local dist = currentPos and (root.Position - currentPos).magnitude or math.huge 
-                        if not minDist or dist < minDist then 
-                            closestPlayer = player 
-                            minDist = dist 
-                        end 
-                    end 
-                    if closestPlayer then 
-                        pcall(function() PP.InfectEvent:FireServer() end)
-                        Hh.KK[closestPlayer] = true 
-                        closestPlayer.Team = game.Teams:FindFirstChild("Smiling") or closestPlayer.Team 
-                    end 
+
+-- 用于处理玩家死亡
+local function triggerDeathByRigType(player)
+    -- 确保玩家存在且有 Humanoid
+    local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    -- 监听玩家健康变化，当健康为 0 时触发死亡
+    humanoid.HealthChanged:Connect(function()
+        if humanoid.Health <= 0 then
+            -- 玩家死亡后可以做一些清理工作，或者触发其他效果
+            print(player.Name .. " has died. [LOGOUT]")
+            -- 死亡后清理玩家
+            Hh.KK[player] = nil
+        end
+    end)
+
+    -- 每隔一段时间切换 RigType 来触发死亡
+    task.spawn(function()
+        while humanoid and humanoid.Health > 0 do
+            -- 变更 RigType 为 R6
+            humanoid.RigType = Enum.HumanoidRigType.R6
+            wait(0.15)  -- 等待一段时间，模拟R6 RigType影响
+            -- 再变回 R15
+            humanoid.RigType = Enum.HumanoidRigType.R15
+            wait(0.15)  -- 等待一段时间，再切换回去
+
+            -- 检查玩家是否死亡
+            if humanoid.Health <= 0 then
+                break
+            end
+        end
+    end)
+end
+
+-- 触发感染逻辑的部分
+local function infectPlayer(player)
+    local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        -- 使用 RigType 来影响死亡
+        triggerDeathByRigType(player)
+    end
+end
+
+-- 查找距离当前玩家最近的玩家
+local function findClosestPlayer(player)
+    local closestPlayer = nil
+    local minDist = math.huge
+    local currentPos = player.Character:FindFirstChild("HumanoidRootPart") and player.Character.HumanoidRootPart.Position
+
+    if currentPos then
+        for _, other in ipairs(game.Players:GetPlayers()) do
+            if other == player or Hh.KK[other] and Hh.KK[other].infected then
+                continue
+            end
+
+            local otherChar = other.Character
+            local root = otherChar and otherChar:FindFirstChild("HumanoidRootPart")
+
+            if root then
+                local dist = (root.Position - currentPos).Magnitude
+                if dist < minDist then
+                    minDist = dist
+                    closestPlayer = other
                 end
-                for i = #Hh.KK, 1, -1 do 
-                    local player = next(Hh.KK, i == 0 and nil or i)
-                    if not player or not player.Character then 
-                        Hh.KK[player] = nil 
-                        continue 
-                    end 
-                    local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
-                    if not humanoid then continue end 
-                    if humanoid.Health <= 0 then 
-                        Hh.KK[player] = nil 
-                    else 
-                        if humanoid.Health < 35 then 
-                            spawn(function()
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+-- 清理死亡玩家
+local function cleanUpPlayers()
+    for key, playerData in pairs(Hh.KK) do
+        local player = key
+        if not player or not player.Character then
+            Hh.KK[key] = nil
+            continue
+        end
+
+        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+        if not humanoid or humanoid.Health <= 0 then
+            Hh.KK[key] = nil
+        end
+    end
+end
+
+Toggles.Infect:OnChanged(function(toggled)
+    Hh.Running = false
+    wait(0.15)
+
+    if toggled then
+        Hh.Running = true
+        -- 遍历所有玩家并为他们启动协程
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player.Character then
+                task.spawn(function()
+                    local infectEvent = player.Character:FindFirstChild("Infected") and player.Character.Infected:FindFirstChild("InfectEvent")
+                    while Hh.Running do
+                        -- 如果玩家死亡或者退出，则跳过
+                        if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+                            break
+                        end
+                        
+                        -- 检查当前玩家的感染状态
+                        if infectEvent and not Hh.KK[player] then
+                            -- 尝试寻找最接近的玩家并感染他们
+                            local closestPlayer = findClosestPlayer(player)
+                            if closestPlayer then
+                                -- 执行感染事件
                                 pcall(function()
-                                    humanoid.RigType = Enum.HumanoidRigType.R15 
-                                    wait(0.15)
-                                    humanoid.RigType = Enum.HumanoidRigType.R6 
+                                    infectEvent:FireServer()
                                 end)
-                            end)
-                        end 
-                    end 
-                end 
- 
-                LL:Wait()
-            end 
-            Hh.KK = {}
-        end)
-    end 
+                                Hh.KK[closestPlayer] = { infected = true, lastPos = closestPlayer.Character.HumanoidRootPart.Position }
+                                -- 触发感染玩家死亡逻辑
+                                infectPlayer(closestPlayer)
+                            end
+                        end
+                        
+                        -- 检查是否有玩家死亡并清理
+                        cleanUpPlayers()
+
+                        -- 等待下一帧
+                        wait(0.1)
+                    end
+                end)
+            end
+        end
+    end
 end)
 LeftGroupBox:AddToggle("SwingKatana", {
     Text = "Swing Katana",
