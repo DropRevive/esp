@@ -525,7 +525,27 @@ RightGroupBox:AddToggle("AntiKillInfectGate", {
     Text = "Anti Kill / Infect Gate",
     Default = false,
 })
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
+RightGroupBox:AddToggle("Infect2", {
+    Text = "Anti prevention",
+    Default = true,
+})
+
+Toggles.Infect2:OnChanged(function(toggled)
+    if toggled then
+        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+        local torso = character:FindFirstChild("Torso")
+
+        if torso then
+            local touchInterest = torso:FindFirstChild("TouchInterest")
+            if touchInterest then
+                touchInterest:Destroy()
+            end
+        end
+    end
+end)
 Toggles.AntiKillInfectGate:OnChanged(function(toggled)
     killGateSwitcherEnabled = toggled
     applyKillGateSwitcherMovement()
