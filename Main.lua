@@ -201,47 +201,73 @@ Toggles.StrongBat:OnChanged(function(toggled)
 end)
 local LocalPlayer = game.Players.LocalPlayer
 
-LeftGroupBox:AddToggle("Infect", {
-    Text = "Infect ON DEATH [TEST!!!!]",
-    Default = true,
+local LocalPlayer = game.Players.LocalPlayer
+
+LeftGroupBox:AddToggle("Skip Smilling", {
+    Text = "Skip Killing Smilling",
+    Default = false,
+})
+
+LeftGroupBox:AddToggle("Auto Infect", {
+    Text = "Auto Infect ON DEATH",
+    Default = true,  -- Default on
 })
 
 local Hh = { KK = {}, Running = false }
 
--- Function to handle player death
+-- Function to handle player death and switch RigType (Skip Smilling logic)
 local function triggerDeathByRigType(player)
     if player == LocalPlayer then return end  -- Skip local player
+
     local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
     if not humanoid then return end
 
+    -- Checking if "Skip Smilling" toggle is on
+    if Toggles["Skip Smilling"].Value and player.Name == "Smilling" then
+        -- If the player is "Smilling", continuously toggle RigType if infected
+        if player.Character:FindFirstChild("Infected") then
+            local infectStatus = player.Character.Infected
+            if infectStatus and infectStatus:FindFirstChild("InfectEvent") then
+                task.spawn(function()
+                    while humanoid and humanoid.Health > 0 do
+                        -- Check if the player is still in the "infecting" process
+                        if infectStatus and infectStatus.Value then
+                            humanoid.RigType = Enum.HumanoidRigType.R6
+                            wait(0.15)
+                            humanoid.RigType = Enum.HumanoidRigType.R15
+                            wait(0.15)
+                        else
+                            break
+                        end
+                        if humanoid.Health <= 0 then
+                            break
+                        end
+                    end
+                end)
+            end
+        end
+    end
+
+    -- Listen to health changes and trigger infection if necessary
     humanoid.HealthChanged:Connect(function()
         if humanoid.Health <= 0 then
             print(player.Name .. " has died.")
             Hh.KK[player] = nil
         end
     end)
-
-    task.spawn(function()
-        while humanoid and humanoid.Health > 0 do
-            humanoid.RigType = Enum.HumanoidRigType.R6
-            wait(0.15)
-            humanoid.RigType = Enum.HumanoidRigType.R15
-            wait(0.15)
-            if humanoid.Health <= 0 then
-                break
-            end
-        end
-    end)
 end
 
+-- Function to infect a player (Auto Infect without conditions)
 local function infectPlayer(player)
     if player == LocalPlayer then return end  -- Skip local player
+
     local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
     if humanoid then
         triggerDeathByRigType(player)
     end
 end
 
+-- Find the closest player in range
 local function findClosestPlayerInRange(player, range)
     local closestPlayer = nil
     local minDist = range
@@ -269,6 +295,7 @@ local function findClosestPlayerInRange(player, range)
     return closestPlayer
 end
 
+-- Clean up players when needed
 local function cleanUpPlayers()
     for key, playerData in pairs(Hh.KK) do
         local player = key
@@ -284,40 +311,35 @@ local function cleanUpPlayers()
     end
 end
 
-Toggles.Infect:OnChanged(function(toggled)
+-- Toggle for Auto Infect (No conditions, infinite loop)
+Toggles["Auto Infect"]:OnChanged(function(toggled)
     Hh.Running = false
     wait(0.15)
 
     if toggled then
         Hh.Running = true
-        for _, player in ipairs(game.Players:GetPlayers()) do
-            if player.Character then
-                task.spawn(function()
-                    local infectEvent = player.Character:FindFirstChild("Infected") and player.Character.Infected:FindFirstChild("InfectEvent")
-                    while Hh.Running do
-                        if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
-                            break
-                        end
-
-                        if infectEvent and not Hh.KK[player] then
-                            local closestPlayer = findClosestPlayerInRange(player, 5)  -- 5 units range
-                            if closestPlayer then
-                                pcall(function()
+        -- Infinite loop for auto infecting players (without conditions)
+        while Hh.Running do
+            for _, player in ipairs(game.Players:GetPlayers()) do
+                if player.Character then
+                    task.spawn(function()
+                        local infectEvent = player.Character:FindFirstChild("Infected") and player.Character.Infected:FindFirstChild("InfectEvent")
+                        if infectEvent then
+                            pcall(function()
+                                -- Directly fire the infection event without any condition
+                                if infectEvent and infectEvent.FireServer then
                                     infectEvent:FireServer()
-                                end)
-                                Hh.KK[closestPlayer] = { infected = true, lastPos = closestPlayer.Character.HumanoidRootPart.Position }
-                                infectPlayer(closestPlayer)
-                            end
+                                end
+                            end)
+                            Hh.KK[player] = { infected = true, lastPos = player.Character.HumanoidRootPart.Position }
+                            infectPlayer(player)
                         end
-                        
-                        cleanUpPlayers()
-                        wait(0.1)
-                    end
-                end)
+                    end)
+                end
             end
+            wait(0.1)
         end
-    end
-end)
+   
 
 LeftGroupBox:AddToggle("SwingKatana", {
     Text = "Swing Katana",
