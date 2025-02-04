@@ -201,16 +201,14 @@ Toggles.StrongBat:OnChanged(function(toggled)
 end)
 local LocalPlayer = game.Players.LocalPlayer
 
-local LocalPlayer = game.Players.LocalPlayer
-
 LeftGroupBox:AddToggle("Skip Smilling", {
-    Text = "Skip Killing Smilling",
+    Text = "Skip Smilling [TEST]",
     Default = false,
 })
 
 LeftGroupBox:AddToggle("Auto Infect", {
-    Text = "Auto Infect ON DEATH",
-    Default = true,  -- Default on
+    Text = "Auto Infect [TEST]",
+    Default = false,  -- Default on
 })
 
 local Hh = { KK = {}, Running = false }
@@ -251,7 +249,7 @@ local function triggerDeathByRigType(player)
     -- Listen to health changes and trigger infection if necessary
     humanoid.HealthChanged:Connect(function()
         if humanoid.Health <= 0 then
-            print(player.Name .. " has died.")
+            print(player.Name .. " has died. [OUTPUT]")
             Hh.KK[player] = nil
         end
     end)
@@ -339,7 +337,22 @@ Toggles["Auto Infect"]:OnChanged(function(toggled)
             end
             wait(0.1)
         end
-   
+    else
+        -- If toggled off, clear infected status
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if Hh.KK[player] then
+                Hh.KK[player].infected = false
+                -- Optionally, reset player's position or any other actions
+            end
+        end
+    end
+end)
+
+-- Toggle for Skip Smilling (only infect if not Smilling)
+Toggles["Skip Smilling"]:OnChanged(function(toggled)
+    -- Print the current state of the toggle
+    print("Skip Killing Smilling is now " .. (toggled and "enabled" or "disabled"))
+end)
 
 LeftGroupBox:AddToggle("SwingKatana", {
     Text = "Swing Katana",
