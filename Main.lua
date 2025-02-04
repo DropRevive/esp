@@ -212,8 +212,20 @@ LeftGroupBox:AddToggle("Auto Infect", {
 })
 
 local Hh = { KK = {}, Running = false }
+game.Players.PlayerAdded:Connect(function(player)
+    player:GetPropertyChangedSignal("Team"):Connect(function()
+        previousTeam[player] = player.Team
+    end)
+    previousTeam[player] = player.Team
+end)
+
+game.Players.PlayerRemoving:Connect(function(player)
+    previousTeam[player] = nil
+end)
 
 -- Function to handle player death and switch RigType (Skip Smilling logic)
+local previousTeam = {}  -- Store previous team of players
+
 local function triggerDeathByRigType(player)
     if player == LocalPlayer then return end  -- Skip local player
 
@@ -221,13 +233,13 @@ local function triggerDeathByRigType(player)
     if not humanoid then return end
 
     -- Checking if "Skip Smilling" toggle is on
-    if Toggles["Skip Smilling"].Value and player.Name == "Smilling" then
-        -- If the player is "Smilling", continuously toggle RigType if infected
-        if player.Character:FindFirstChild("Infected") then
+    if Toggles["Skip Smilling"].Value then
+        -- If the player's team is "Smilling" and was previously "Human", continuously toggle RigType if infected
+        if previousTeam[player] == game.Teams.Human and player.Team == game.Teams.Smilling and player.Character:FindFirstChild("Infected") then
             local infectStatus = player.Character.Infected
             if infectStatus and infectStatus:FindFirstChild("InfectEvent") then
                 task.spawn(function()
-                    while humanoid and humanoid.Health > 0 do
+                    while humanoid and humanoid.Health >= 0 do
                         -- Check if the player is still in the "infecting" process
                         if infectStatus and infectStatus.Value then
                             humanoid.RigType = Enum.HumanoidRigType.R6
@@ -237,7 +249,7 @@ local function triggerDeathByRigType(player)
                         else
                             break
                         end
-                        if humanoid.Health <= 0 then
+                        if humanoid.Health < 0 then
                             break
                         end
                     end
@@ -249,11 +261,12 @@ local function triggerDeathByRigType(player)
     -- Listen to health changes and trigger infection if necessary
     humanoid.HealthChanged:Connect(function()
         if humanoid.Health <= 0 then
-            print(player.Name .. " has died. [OUTPUT]")
             Hh.KK[player] = nil
         end
     end)
 end
+
+-- Update previous team information when player joins or changes team
 
 -- Function to infect a player (Auto Infect without conditions)
 local function infectPlayer(player)
