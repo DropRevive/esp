@@ -528,21 +528,25 @@ RightGroupBox:AddToggle("AntiKillInfectGate", {
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
-RightGroupBox:AddToggle("Infect2", {
+LeftGroupBox:AddToggle("Infect", {
     Text = "Anti prevention",
     Default = true,
 })
 
-Toggles.Infect2:OnChanged(function(toggled)
+Toggles.Infect:OnChanged(function(toggled)
     if toggled then
-        local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-        local torso = character:FindFirstChild("Torso")
+        while true do
+            local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local torso = character:FindFirstChild("Torso")
 
-        if torso then
-            local touchInterest = torso:FindFirstChild("TouchInterest")
-            if touchInterest then
-                touchInterest:Destroy()
+            if torso then
+                local touchInterest = torso:FindFirstChild("TouchInterest")
+                if touchInterest then
+                    touchInterest:Destroy()
+                end
             end
+
+            wait(1) -- 每秒检查一次
         end
     end
 end)
