@@ -3789,9 +3789,6 @@ MiscPlayer = Tap.Player:AddSection('Misc Player') do
 			PlayerGui.hud.safezone.backpack.inventory.Sell.sellall.Disabled = false
 		end
 	end)
-	Toggle(MiscPlayer, "Infinite Oxygen", "", "Infinite Oxygen", function(Value)
-		LocalPlayer.Character.client.oxygen.Disabled = Value
-	end)
 	Toggle(MiscPlayer, "Weather Clear", "", "Weather Clear", function(Value)
 		local OldWEA = ReplicatedStorage.world.weather.Value
 		if Value then
