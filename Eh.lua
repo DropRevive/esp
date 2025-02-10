@@ -23,23 +23,6 @@ local function createInstance(className, properties, parent)
     return instance
 end
 
-local function getHardwareID()
-    local hwid = ""
-    local guid = game:GetService("RbxAnalyticsService"):GetClientId()
-    
-    for i = 1, #guid do
-        local byte = string.byte(guid, i)
-        hwid = hwid .. string.format("%02X", byte)
-    end
-
-    return hwid
-end
-local hwid = getHardwareID()
-print("loading Executor")
-wait(1)
-
-print(hwid)
-print("success now")
 local ScreenGui = createInstance("ScreenGui", { Name = hwid }, cloneRef("CoreGui"))
 local Frame = createInstance("Frame", {
     BackgroundColor3 = Color3.fromRGB(0, 0, 0), 
@@ -55,7 +38,7 @@ local Title = createInstance("TextLabel", {
     Position = UDim2.new(0, 0, 0, 2),
     AnchorPoint = Vector2.new(0, 0),
     BackgroundTransparency = 1,
-    Text = "TyrenuX V1.0",
+    Text = "VynSalp Studio.1",
     TextColor3 = Color3.fromRGB(255, 255, 255),
     TextSize = 15,
     Font = Enum.Font.RobotoMono,
