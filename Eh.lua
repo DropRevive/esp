@@ -451,7 +451,7 @@ local ScriptbloxButton = createInstance("TextButton", {
     TextSize = 15,
     Font = Enum.Font.RobotoMono,
     TextXAlignment = Enum.TextXAlignment.Center,
-    Visible = false
+    Visible = true
 }, Frame)
 
 local SearchBox = createInstance("TextBox", {
