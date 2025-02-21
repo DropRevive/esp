@@ -214,7 +214,7 @@ local Title = createInstance("ImageLabel", {
     Position = UDim2.new(0, 0, 0, 2),
     AnchorPoint = Vector2.new(0, 0),
     BackgroundTransparency = 1,
-    Image = "rbxassetid://13369885650",
+    Image = "rbxassetid://15960343185",
 }, Frame)
 
 local ImageButton = createInstance("ImageButton", {
