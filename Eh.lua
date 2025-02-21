@@ -209,16 +209,12 @@ local Frame = createInstance("Frame", {
     Active = true
 }, ScreenGui)
 
-local Title = createInstance("TextLabel", {
+local Title = createInstance("ImageLabel", {
     Size = UDim2.new(0.9, 0, 1, -4),
     Position = UDim2.new(0, 0, 0, 2),
     AnchorPoint = Vector2.new(0, 0),
     BackgroundTransparency = 1,
-    Text = "Luau Exploit.1",
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 15,
-    Font = Enum.Font.RobotoMono,
-    TextXAlignment = Enum.TextXAlignment.Left
+    Image = "rbxassetid://13369885650",
 }, Frame)
 
 local ImageButton = createInstance("ImageButton", {
