@@ -209,12 +209,17 @@ local Frame = createInstance("Frame", {
     Active = true
 }, ScreenGui)
 
-local Title = createInstance("ImageLabel", {
+local versionNumber = game.PlaceVersion  -- get currentplaceversion
+local Title = createInstance("TextLabel", {
     Size = UDim2.new(0.9, 0, 1, -4),
     Position = UDim2.new(0, 0, 0, 2),
     AnchorPoint = Vector2.new(0, 0),
     BackgroundTransparency = 1,
-    Image = "rbxassetid://15960343185",
+    Text = "Rhetorical Edition / " .. versionNumber,
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextSize = 15,
+    Font = Enum.Font.RobotoMono,
+    TextXAlignment = Enum.TextXAlignment.Left
 }, Frame)
 
 local ImageButton = createInstance("ImageButton", {
