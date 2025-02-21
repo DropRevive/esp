@@ -318,6 +318,8 @@ ImageButton.MouseButton1Click:Connect(function()
         ConsoleButton.Visible = false
         InputBox.Visible = false
         ConsoleFrame.Visible = false
+        SearchBox.Visible = false
+        SearchResultFrame.Visible = false
     else
         local tween = TweenService:Create(Frame, tweenInfo, {Size = UDim2.new(0, 600, 0, 500)})
         tween:Play()
@@ -442,7 +444,7 @@ local ScriptbloxButton = createInstance("TextButton", {
     Position = UDim2.new(0, 250, 0, 30),
     AnchorPoint = Vector2.new(0, 0),
     BackgroundTransparency = 1,
-    Text = "Scriptblox",
+    Text = "Scripthub",
     TextColor3 = Color3.fromRGB(255, 255, 255),
     TextSize = 15,
     Font = Enum.Font.RobotoMono,
@@ -456,7 +458,7 @@ local SearchBox = createInstance("TextBox", {
     AnchorPoint = Vector2.new(0, 0),
     BackgroundTransparency = 1,
     BorderSizePixel = 0,
-    Text = "Search...",
+    Text = "search for script",
     TextColor3 = Color3.fromRGB(255, 255, 255),
     TextSize = 15,
     Font = Enum.Font.RobotoMono,
