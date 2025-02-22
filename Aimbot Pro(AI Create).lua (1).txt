@@ -153,22 +153,6 @@ local function aimAtTarget()
 end
 
 -- 绘制红线
-local function drawLine()
-    if target then
-        local targetPosition = target.Position
-        local playerPosition = player.Character.Head.Position
-        local line = Instance.new("Part")
-        line.Anchored = true
-        line.CanCollide = false
-        line.Size = Vector3.new(0.1, 0.1, (targetPosition - playerPosition).Magnitude)
-        line.CFrame = CFrame.new(playerPosition, targetPosition) * CFrame.new(0, 0, -line.Size.Z / 2)
-        line.Color = Color3.fromRGB(255, 0, 0)
-        line.Parent = workspace
-
-        game.Debris:AddItem(line, 0.1)  -- 0.1秒后删除辅助线
-    end
-end
-
 -- 绘制瞄准框
 local function drawBox()
     if target then
@@ -262,7 +246,6 @@ runService.RenderStepped:Connect(function()
     if aimbotEnabled then
         target = findNearestTargetHead()
         aimAtTarget()
-        drawLine()
         drawBox()
         updateTargetInfo()
     end
