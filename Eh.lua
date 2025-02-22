@@ -221,6 +221,49 @@ local Title = createInstance("TextLabel", {
     Font = Enum.Font.RobotoMono,
     TextXAlignment = Enum.TextXAlignment.Left
 }, Frame)
+local ScriptbloxButton = createInstance("TextButton", {
+    Size = UDim2.new(0, 70, 0, 20),
+    Position = UDim2.new(0, 250, 0, 30),
+    AnchorPoint = Vector2.new(0, 0),
+    BackgroundTransparency = 1,
+    Text = "Scriptblox",
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextSize = 15,
+    Font = Enum.Font.RobotoMono,
+    TextXAlignment = Enum.TextXAlignment.Center,
+    Visible = true
+}, Frame)
+
+local SearchBox = createInstance("TextBox", {
+    Size = UDim2.new(1, -20, 0, 30),
+    Position = UDim2.new(0, 10, 0, 10),
+    AnchorPoint = Vector2.new(0, 0),
+    BackgroundTransparency = 1,
+    BorderSizePixel = 0,
+    Text = "Search...",
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextSize = 15,
+    Font = Enum.Font.RobotoMono,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    ClearTextOnFocus = false,
+    Visible = false
+}, Frame)
+
+local SearchResultFrame = createInstance("ScrollingFrame", {
+    Size = UDim2.new(1, -20, 0, 300),
+    Position = UDim2.new(0, 10, 0, 50),
+    AnchorPoint = Vector2.new(0, 0),
+    BackgroundTransparency = 1,
+    BorderSizePixel = 0,
+    CanvasSize = UDim2.new(0, 0, 0, 0),
+    ScrollBarThickness = 8,
+    Visible = false
+}, Frame)
+
+local SearchLayout = createInstance("UIListLayout", {
+    SortOrder = Enum.SortOrder.LayoutOrder,
+    Padding = UDim.new(0, 5)
+}, SearchResultFrame)
 
 local ImageButton = createInstance("ImageButton", {
     Size = UDim2.new(0, 20, 0, 20),
@@ -323,6 +366,7 @@ ImageButton.MouseButton1Click:Connect(function()
         ConsoleButton.Visible = false
         InputBox.Visible = false
         ConsoleFrame.Visible = false
+        ScriptbloxButton.Visible = false
     else
         local tween = TweenService:Create(Frame, tweenInfo, {Size = UDim2.new(0, 600, 0, 500)})
         tween:Play()
@@ -333,6 +377,7 @@ ImageButton.MouseButton1Click:Connect(function()
         ExecuteButton.Visible = true
         ClearButton.Visible = true
         ConsoleButton.Visible = true
+        ScriptbloxButton.Visible = true
         if not isConsoleOpen then
             InputBox.Visible = true
         end
@@ -346,11 +391,13 @@ ConsoleButton.MouseButton1Click:Connect(function()
         ExecuteButton.Visible = true
         ClearButton.Visible = true
         ConsoleFrame.Visible = false
+        ScriptbloxButton.Visible = true
     else
         InputBox.Visible = false
         ExecuteButton.Visible = false
         ClearButton.Visible = false
         ConsoleFrame.Visible = true
+        ScriptbloxButton.Visible = false
     end
     isConsoleOpen = not isConsoleOpen
 end)
@@ -441,50 +488,6 @@ UIS.InputChanged:Connect(function(input)
         update(input)
     end
 end)
-
-local ScriptbloxButton = createInstance("TextButton", {
-    Size = UDim2.new(0, 70, 0, 20),
-    Position = UDim2.new(0, 250, 0, 30),
-    AnchorPoint = Vector2.new(0, 0),
-    BackgroundTransparency = 1,
-    Text = "Scriptblox",
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 15,
-    Font = Enum.Font.RobotoMono,
-    TextXAlignment = Enum.TextXAlignment.Center,
-    Visible = true
-}, Frame)
-
-local SearchBox = createInstance("TextBox", {
-    Size = UDim2.new(1, -20, 0, 30),
-    Position = UDim2.new(0, 10, 0, 10),
-    AnchorPoint = Vector2.new(0, 0),
-    BackgroundTransparency = 1,
-    BorderSizePixel = 0,
-    Text = "Search...",
-    TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 15,
-    Font = Enum.Font.RobotoMono,
-    TextXAlignment = Enum.TextXAlignment.Left,
-    ClearTextOnFocus = false,
-    Visible = false
-}, Frame)
-
-local SearchResultFrame = createInstance("ScrollingFrame", {
-    Size = UDim2.new(1, -20, 0, 300),
-    Position = UDim2.new(0, 10, 0, 50),
-    AnchorPoint = Vector2.new(0, 0),
-    BackgroundTransparency = 1,
-    BorderSizePixel = 0,
-    CanvasSize = UDim2.new(0, 0, 0, 0),
-    ScrollBarThickness = 8,
-    Visible = false
-}, Frame)
-
-local SearchLayout = createInstance("UIListLayout", {
-    SortOrder = Enum.SortOrder.LayoutOrder,
-    Padding = UDim.new(0, 5)
-}, SearchResultFrame)
 
 local isScriptbloxOpen = false
 
