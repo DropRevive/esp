@@ -1,10 +1,8 @@
--- Finter Library 
-local fl = {}
-fl.__index = fl
+local FinterLibrary = {}
 
-local ui = Instance.new("ScreenGui")
-ui.Name = "FLUI"
-ui.Parent = game:GetService("CoreGui")
+local gui = Instance.new("ScreenGui")
+gui.Name = "FLUI"
+gui.Parent = game:GetService("CoreGui")
 
 local posX = 0.05
 
@@ -18,7 +16,7 @@ local function calcSize(f)
     return totalHeight
 end
 
-function fl:CreateUI(cfg)
+function FinterLibrary.CreateUI(cfg)
     local mf = Instance.new("Frame")
     mf.Name = cfg.Title or "MainFrame"
     mf.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -62,7 +60,7 @@ function fl:CreateUI(cfg)
     local cl = Instance.new("UIListLayout")
     cl.Parent = cf
 
-    self:AdjustFrameSize(mf)
+    FinterLibrary.AdjustFrameSize(mf)
 
     mf.Position = UDim2.new(posX, 0, 0.1, 0)
     posX = posX + 0.25
@@ -70,7 +68,7 @@ function fl:CreateUI(cfg)
     return mf, cf
 end
 
-function fl:CreateButton(p, cfg)
+function FinterLibrary.CreateButton(p, cfg)
     local b = Instance.new("TextButton")
     b.Name = cfg.title
     b.Size = UDim2.new(1, 0, 0, 30)
@@ -88,7 +86,7 @@ function fl:CreateButton(p, cfg)
     return b
 end
 
-function fl:CreateToggle(p, cfg)
+function FinterLibrary.CreateToggle(p, cfg)
     local t = Instance.new("TextButton")
     t.Name = cfg.title
     t.Size = UDim2.new(1, 0, 0, 30)
@@ -111,7 +109,7 @@ function fl:CreateToggle(p, cfg)
     return t
 end
 
-function fl:AdjustFrameSize(f)
+function FinterLibrary.AdjustFrameSize(f)
     local cf = f:FindFirstChild("ContentFrame")
     local cl = cf:FindFirstChildOfClass("UIListLayout")
     if cl then
@@ -123,5 +121,3 @@ function fl:AdjustFrameSize(f)
         tb.Size = UDim2.new(1, 0, 0, th + 30)
     end
 end
-
-shared.FinterLibrary = fl
