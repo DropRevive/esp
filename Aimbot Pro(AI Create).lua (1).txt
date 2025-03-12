@@ -1,17 +1,19 @@
 local UIS = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 local players = game:GetService("Players")
-local screenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))  -- 创建ScreenGui并附加到CoreGui
+local screenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
 
 -- 给screenGui取一个名字
-screenGui.Name = "MyCustomScreenGui"  -- 你可以根据需要自定义这个名字
+screenGui.Name = "MyCustomScreenGui"
 
 local player = players.LocalPlayer
 local camera = workspace.CurrentCamera
 
 local aimbotEnabled = false
 local colorCheckEnabled = false
+local rangeAimEnabled = false
 local target
+local circleRadius = 100
 
 -- 自瞄切换按钮
 local toggleAimbotButton = Instance.new("TextButton", screenGui)
@@ -39,79 +41,48 @@ toggleColorCheckButton.MouseButton1Click:Connect(function()
     toggleColorCheckButton.Text = colorCheckEnabled and "Color Check ON" or "Color Check OFF"
 end)
 
+-- 范围自瞄切换按钮
+local toggleRangeAimButton = Instance.new("TextButton", screenGui)
+toggleRangeAimButton.Size = UDim2.new(0, 150, 0, 50)
+toggleRangeAimButton.Position = UDim2.new(0, 20, 0.5, -30)
+toggleRangeAimButton.Text = "Range Aim"
+toggleRangeAimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleRangeAimButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+toggleRangeAimButton.MouseButton1Click:Connect(function()
+    rangeAimEnabled = not rangeAimEnabled
+    toggleRangeAimButton.Text = rangeAimEnabled and "Range Aim ON" or "Range Aim OFF"
+end)
+
 -- 创建中空的圆框
 local aimCircle = Instance.new("Frame", screenGui)
-aimCircle.Size = UDim2.new(0, 200, 0, 200)
-aimCircle.Position = UDim2.new(0.5, -100, 0.5, -100)
+aimCircle.Size = UDim2.new(0, circleRadius * 2, 0, circleRadius * 2)
+aimCircle.Position = UDim2.new(0.5, -circleRadius, 0.5, -circleRadius)
 aimCircle.BackgroundTransparency = 1
 aimCircle.BorderSizePixel = 3
 aimCircle.BorderColor3 = Color3.fromRGB(255, 255, 255)
 aimCircle.AnchorPoint = Vector2.new(0.5, 0.5)
 
--- 显示目标玩家信息的框
-local targetInfoFrame = Instance.new("Frame", screenGui)
-targetInfoFrame.Size = UDim2.new(0, 350, 0, 100)
-targetInfoFrame.Position = UDim2.new(0.5, -450, 0.5, -175)
-targetInfoFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-targetInfoFrame.BackgroundTransparency = 0.5
-targetInfoFrame.BorderSizePixel = 2
-targetInfoFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+-- 创建滑块来调整圆圈大小
+local slider = Instance.new("TextBox", screenGui)
+slider.Size = UDim2.new(0, 150, 0, 50)
+slider.Position = UDim2.new(0, 20, 0.5, 30)
+slider.Text = tostring(circleRadius)
+slider.TextColor3 = Color3.fromRGB(255, 255, 255)
+slider.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 
--- 显示目标玩家名字的标签
-local targetNameLabel = Instance.new("TextLabel", targetInfoFrame)
-targetNameLabel.Size = UDim2.new(0, 180, 0, 50)
-targetNameLabel.Position = UDim2.new(0, 10, 0, 10)
-targetNameLabel.Text = "No Target"
-targetNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-targetNameLabel.TextScaled = true
-targetNameLabel.BackgroundTransparency = 1
-targetNameLabel.TextStrokeTransparency = 0.8
+slider.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        local newRadius = tonumber(slider.Text)
+        if newRadius then
+            circleRadius = math.clamp(newRadius, 50, 300)
+            aimCircle.Size = UDim2.new(0, circleRadius * 2, 0, circleRadius * 2)
+            aimCircle.Position = UDim2.new(0.5, -circleRadius, 0.5, -circleRadius)
+        end
+    end
+end)
 
--- 显示目标玩家头像的框
-local targetImageLabel = Instance.new("ImageLabel", targetInfoFrame)
-targetImageLabel.Size = UDim2.new(0, 50, 0, 50)
-targetImageLabel.Position = UDim2.new(0.5, -25, 0.5, -25)
-targetImageLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-targetImageLabel.BackgroundTransparency = 1
-targetImageLabel.Image = ""  -- 目标玩家头像图片链接
-
--- 显示目标玩家详细信息的标签
-local targetDetailsLabel = Instance.new("TextLabel", screenGui)
-targetDetailsLabel.Size = UDim2.new(0, 220, 0, 150)
-targetDetailsLabel.Position = UDim2.new(0, 20, 0.5, 60)
-targetDetailsLabel.Text = "Target Info: N/A"
-targetDetailsLabel.TextWrapped = true
-targetDetailsLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-targetDetailsLabel.BackgroundTransparency = 0.5
-targetDetailsLabel.BorderSizePixel = 2
-targetDetailsLabel.BorderColor3 = Color3.fromRGB(255, 255, 255)
-targetDetailsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-targetDetailsLabel.Font = Enum.Font.Code
-targetDetailsLabel.TextStrokeTransparency = 0.8
-
--- 显示玩家自身详细信息的标签
-local playerDetailsLabel = Instance.new("TextLabel", screenGui)
-playerDetailsLabel.Size = UDim2.new(0, 350, 0, 100)
-playerDetailsLabel.Position = UDim2.new(0.5, -450, 0.5, -50)
-playerDetailsLabel.Text = "Player Info: N/A"
-playerDetailsLabel.TextWrapped = true
-playerDetailsLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-playerDetailsLabel.BackgroundTransparency = 0.5
-playerDetailsLabel.BorderSizePixel = 2
-playerDetailsLabel.BorderColor3 = Color3.fromRGB(255, 255, 255)
-playerDetailsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-playerDetailsLabel.Font = Enum.Font.Code
-playerDetailsLabel.TextStrokeTransparency = 0.8
-
--- 创建玩家当前手持物品的图标
-local playerToolImage = Instance.new("ImageLabel", playerDetailsLabel)
-playerToolImage.Size = UDim2.new(0, 50, 0, 50)
-playerToolImage.Position = UDim2.new(0, 170, 0, 10)
-playerToolImage.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-playerToolImage.BackgroundTransparency = 1
-playerToolImage.Image = ""  -- 玩家当前手持物品的图标链接
-
--- 查找最近的目标头部
+-- 查找最近目标头部
 local function findNearestTargetHead()
     local nearestTarget
     local shortestDistance = math.huge
@@ -132,6 +103,9 @@ local function findNearestTargetHead()
 
             local head = otherPlayer.Character.Head
             local distance = (head.Position - player.Character.Head.Position).Magnitude
+            if rangeAimEnabled and distance > circleRadius then
+                continue
+            end
             if distance < shortestDistance then
                 shortestDistance = distance
                 nearestTarget = head
@@ -152,7 +126,6 @@ local function aimAtTarget()
     end
 end
 
--- 绘制红线
 -- 绘制瞄准框
 local function drawBox()
     if target then
@@ -243,8 +216,14 @@ end
 
 -- 在每帧更新时调用
 runService.RenderStepped:Connect(function()
-    if aimbotEnabled then
+    if aimbotEnabled or rangeAimEnabled then
         target = findNearestTargetHead()
+        if rangeAimEnabled and target then
+            local distance = (target.Position - player.Character.Head.Position).Magnitude
+            if distance > circleRadius then
+                target = nil
+            end
+        end
         aimAtTarget()
         drawBox()
         updateTargetInfo()
