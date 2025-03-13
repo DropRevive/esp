@@ -156,29 +156,3 @@ runService.RenderStepped:Connect(function()
         drawBox()
     end
 end)
-
-local CoreGui = game:GetService("CoreGui")
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "cir ain"
-screenGui.Parent = CoreGui
-
-local outerCircle = Instance.new("Frame")
-outerCircle.Size = UDim2.new(0, 800, 0, 800) -- 设置非常大的外圆
-outerCircle.Position = UDim2.new(0.5, -400, 0.5, -400) -- 屏幕正中间
-outerCircle.AnchorPoint = Vector2.new(0.5, 0.5)
-outerCircle.BackgroundColor3 = Color3.new(1, 1, 1) -- 白色
-outerCircle.BackgroundTransparency = 0 -- 不透明外圆
-outerCircle.Parent = screenGui
-
-local outerCorner = Instance.new("UICorner")
-outerCorner.CornerRadius = UDim.new(1, 0)
-outerCorner.Parent = outerCircle
-
-local innerCircle = Instance.new("Frame")
-innerCircle.Size = UDim2.new(0, 700, 0, 700) -- 内圆略小以实现空心效果
-innerCircle.Position = UDim2.new(0.5, -350, 0.5, -350) -- 保持在正中间
-innerCircle.AnchorPoint = Vector2.new(0.5, 0.5)
-innerCircle.BackgroundColor3 = Color3.new(0, 0, 0) -- 与背景色一致
-innerCircle.BackgroundTransparency = 1 -- 完全透明以看起来为空心
-innerCircle.ZIndex = 2
-innerCircle.Parent = outerCircle
