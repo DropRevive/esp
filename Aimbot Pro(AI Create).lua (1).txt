@@ -9,61 +9,31 @@ screenGui.Name = "MyCustomScreenGui"
 local player = players.LocalPlayer
 local camera = workspace.CurrentCamera
 
+-- 初始变量
 local aimbotEnabled = false
 local colorCheckEnabled = false
 local rangeAimEnabled = false
+local rangeEnabled = false
 local target
 local circleRadius = 100
 
--- 自瞄切换按钮
-local toggleAimbotButton = Instance.new("TextButton", screenGui)
-toggleAimbotButton.Size = UDim2.new(0, 150, 0, 50)
-toggleAimbotButton.Position = UDim2.new(0, 20, 0.5, -150)
-toggleAimbotButton.Text = "Toggle Aimbot"
-toggleAimbotButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleAimbotButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+-- 中心白色准心
+local crosshair = Instance.new("Frame", screenGui)
+crosshair.Size = UDim2.new(0, 5, 0, 5)
+crosshair.Position = UDim2.new(0.5, -2.5, 0.5, -2.5)
+crosshair.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- 白色准心
+crosshair.AnchorPoint = Vector2.new(0.5, 0.5)
 
-toggleAimbotButton.MouseButton1Click:Connect(function()
-    aimbotEnabled = not aimbotEnabled
-    toggleAimbotButton.Text = aimbotEnabled and "Aimbot ON" or "Aimbot OFF"
-end)
-
--- 颜色队伍检测切换按钮
-local toggleColorCheckButton = Instance.new("TextButton", screenGui)
-toggleColorCheckButton.Size = UDim2.new(0, 150, 0, 50)
-toggleColorCheckButton.Position = UDim2.new(0, 20, 0.5, -90)
-toggleColorCheckButton.Text = "Color Check"
-toggleColorCheckButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleColorCheckButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-
-toggleColorCheckButton.MouseButton1Click:Connect(function()
-    colorCheckEnabled = not colorCheckEnabled
-    toggleColorCheckButton.Text = colorCheckEnabled and "Color Check ON" or "Color Check OFF"
-end)
-
--- 范围自瞄切换按钮
-local toggleRangeAimButton = Instance.new("TextButton", screenGui)
-toggleRangeAimButton.Size = UDim2.new(0, 150, 0, 50)
-toggleRangeAimButton.Position = UDim2.new(0, 20, 0.5, -30)
-toggleRangeAimButton.Text = "Range Aim"
-toggleRangeAimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleRangeAimButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-
-toggleRangeAimButton.MouseButton1Click:Connect(function()
-    rangeAimEnabled = not rangeAimEnabled
-    toggleRangeAimButton.Text = rangeAimEnabled and "Range Aim ON" or "Range Aim OFF"
-end)
-
--- 创建中空的圆框
+-- 中空白色圆圈
 local aimCircle = Instance.new("Frame", screenGui)
 aimCircle.Size = UDim2.new(0, circleRadius * 2, 0, circleRadius * 2)
 aimCircle.Position = UDim2.new(0.5, -circleRadius, 0.5, -circleRadius)
 aimCircle.BackgroundTransparency = 1
 aimCircle.BorderSizePixel = 3
-aimCircle.BorderColor3 = Color3.fromRGB(255, 255, 255)
+aimCircle.BorderColor3 = Color3.fromRGB(255, 255, 255) -- 白色圆圈
 aimCircle.AnchorPoint = Vector2.new(0.5, 0.5)
 
--- 创建滑块来调整圆圈大小
+-- 滑块调整圆圈大小
 local slider = Instance.new("TextBox", screenGui)
 slider.Size = UDim2.new(0, 150, 0, 50)
 slider.Position = UDim2.new(0, 20, 0.5, 30)
@@ -82,6 +52,43 @@ slider.FocusLost:Connect(function(enterPressed)
     end
 end)
 
+-- 开关按钮创建函数
+local function createToggleButton(position, text, callback)
+    local button = Instance.new("TextButton", screenGui)
+    button.Size = UDim2.new(0, 150, 0, 50)
+    button.Position = position
+    button.Text = text
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+    button.MouseButton1Click:Connect(callback)
+    return button
+end
+
+-- 自瞄开关
+createToggleButton(UDim2.new(0, 20, 0.5, -150), "Toggle Aimbot", function()
+    aimbotEnabled = not aimbotEnabled
+    print("Aimbot:", aimbotEnabled)
+end)
+
+-- 队伍检测开关
+createToggleButton(UDim2.new(0, 20, 0.5, -90), "Team Check", function()
+    colorCheckEnabled = not colorCheckEnabled
+    print("Team Check:", colorCheckEnabled)
+end)
+
+-- 范围自瞄开关
+createToggleButton(UDim2.new(0, 20, 0.5, -30), "Range Aim", function()
+    rangeAimEnabled = not rangeAimEnabled
+    print("Range Aim:", rangeAimEnabled)
+end)
+
+-- 范围功能开关
+createToggleButton(UDim2.new(0, 20, 0.5, 30), "Enable Range", function()
+    rangeEnabled = not rangeEnabled
+    print("Enable Range:", rangeEnabled)
+end)
+
 -- 查找最近目标头部
 local function findNearestTargetHead()
     local nearestTarget
@@ -96,16 +103,17 @@ local function findNearestTargetHead()
                 continue
             end
 
-            -- 检查颜色队伍
+            -- 检查队伍颜色
             if colorCheckEnabled and otherPlayer.TeamColor == player.TeamColor then
                 continue
             end
 
             local head = otherPlayer.Character.Head
             local distance = (head.Position - player.Character.Head.Position).Magnitude
-            if rangeAimEnabled and distance > circleRadius then
+            if rangeEnabled and distance > circleRadius then
                 continue
             end
+
             if distance < shortestDistance then
                 shortestDistance = distance
                 nearestTarget = head
@@ -126,107 +134,51 @@ local function aimAtTarget()
     end
 end
 
--- 绘制瞄准框
+-- 绘制绿色瞄准框
 local function drawBox()
-    if target then
-        local character = target.Parent
-        if character and character:FindFirstChild("HumanoidRootPart") then
-            local hrp = character.HumanoidRootPart
-            local size = hrp.Size * 2  -- 调整框的大小以覆盖整个角色
-            local box = Instance.new("SelectionBox")
+    if target and target.Parent then
+        local hrp = target.Parent:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            local box = Instance.new("SelectionBox", hrp)
             box.Adornee = hrp
             box.LineThickness = 0.05
-            box.Color3 = Color3.fromRGB(0, 255, 0)  -- 绿色框
-            box.Parent = workspace
-
-            game.Debris:AddItem(box, 0.1)  -- 0.1秒后删除瞄准框
+            box.Color3 = Color3.fromRGB(0, 255, 0) -- 绿色框
+            game.Debris:AddItem(box, 0.1)
         end
     end
 end
 
--- 获取玩家当前手持物品名称和图标
-local function getToolInfo(character)
-    local tool = character:FindFirstChildOfClass("Tool")
-    if tool then
-        return tool.Name, tool.TextureId  -- 假设 TextureId 是工具的图标链接
-    else
-        return "None", ""
-    end
-end
-
--- 更新目标玩家信息
-local function updateTargetInfo()
-    if target then
-        local targetPlayer = players:GetPlayerFromCharacter(target.Parent)
-        if targetPlayer then
-            targetNameLabel.Text = targetPlayer.Name
-
-            -- 更新目标玩家详细信息
-            local targetHumanoid = targetPlayer.Character:FindFirstChild("Humanoid")
-            local targetPosition = targetPlayer.Character:FindFirstChild("HumanoidRootPart") and targetPlayer.Character.HumanoidRootPart.Position
-            local targetTeam = targetPlayer.Team and targetPlayer.Team.Name or "N/A"
-            local targetSpeed = targetHumanoid and targetHumanoid.WalkSpeed or "N/A"
-            local targetToolName, targetToolImageId = getToolInfo(targetPlayer.Character)
-            
-            local infoText = string.format("Health: %s\nPosition: %s\nTeam: %s\nSpeed: %s\nTool: %s",
-                targetHumanoid and math.floor(targetHumanoid.Health) or "N/A",
-                targetPosition and tostring(targetPosition) or "N/A",
-                targetTeam,
-                targetSpeed,
-                targetToolName
-            )
-            targetDetailsLabel.Text = "Target Info:\n" .. infoText
-
-            -- 更新目标玩家头像
-            targetImageLabel.Image = targetToolImageId
-        else
-            targetNameLabel.Text = "No Target"
-            targetDetailsLabel.Text = "Target Info: N/A"
-            targetImageLabel.Image = ""
-        end
-    else
-        targetNameLabel.Text = "No Target"
-        targetDetailsLabel.Text = "Target Info: N/A"
-        targetImageLabel.Image = ""
-    end
-end
-
--- 更新玩家自身信息
-local function updatePlayerInfo()
-    local playerHumanoid = player.Character and player.Character:FindFirstChild("Humanoid")
-    local playerPosition = player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character.HumanoidRootPart.Position
-    local playerTeam = player.Team and player.Team.Name or "N/A"
-    local playerSpeed = playerHumanoid and playerHumanoid.WalkSpeed or "N/A"
-
-    -- 获取自身当前手持物品名称和图标
-    local playerToolName, playerToolImageId = getToolInfo(player.Character)
-
-    local infoText = string.format("Health: %s\nPosition: %s\nTeam: %s\nSpeed: %s\nTool: %s",
-        playerHumanoid and math.floor(playerHumanoid.Health) or "N/A",
-        playerPosition and tostring(playerPosition) or "N/A",
-        playerTeam,
-        playerSpeed,
-        playerToolName
-    )
-    playerDetailsLabel.Text = "Player Info:\n" .. infoText
-
-    -- 更新玩家当前手持物品图标
-    playerToolImage.Image = playerToolImageId
-end
-
--- 在每帧更新时调用
+-- 每帧更新
 runService.RenderStepped:Connect(function()
     if aimbotEnabled or rangeAimEnabled then
         target = findNearestTargetHead()
-        if rangeAimEnabled and target then
-            local distance = (target.Position - player.Character.Head.Position).Magnitude
-            if distance > circleRadius then
-                target = nil
-            end
-        end
         aimAtTarget()
         drawBox()
-        updateTargetInfo()
     end
-    updatePlayerInfo()
 end)
+
+local CoreGui2 = game:GetService("CoreGui")
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "cir ain"
+screenGui.Parent = CoreGui2
+
+local outerCircle = Instance.new("Frame")
+outerCircle.Size = UDim2.new(0, 200, 0, 200)
+outerCircle.Position = UDim2.new(0.5, -100, 0.5, -100)
+outerCircle.AnchorPoint = Vector2.new(0.5, 0.5)
+outerCircle.BackgroundColor3 = Color3.new(1, 1, 1)
+outerCircle.BackgroundTransparency = 0
+outerCircle.Parent = screenGui
+
+local outerCorner = Instance.new("UICorner")
+outerCorner.CornerRadius = UDim.new(1, 0)
+outerCorner.Parent = outerCircle
+
+local innerCircle = Instance.new("Frame")
+innerCircle.Size = UDim2.new(0, 160, 0, 160)
+innerCircle.Position = UDim2.new(0.5, -80, 0.5, -80)
+innerCircle.AnchorPoint = Vector2.new(0.5, 0.5)
+innerCircle.BackgroundColor3 = Color3.new(0, 0, 0)
+innerCircle.BackgroundTransparency = 1
+innerCircle.ZIndex = 2
+innerCircle.Parent = outerCircle
